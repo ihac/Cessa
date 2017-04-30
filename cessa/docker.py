@@ -34,7 +34,7 @@ def ls_images(all_=False, quiet=False, display=False, no_trunc=False):
                        universal_newlines=True)
     return (p.stdout, None) if p.returncode == 0 else (None, p.stderr)
 
-def ls_containers(all_=False, quiet=False, no_trunc=False, filters=None display=False):
+def ls_containers(all_=False, quiet=False, no_trunc=False, filters=None, display=False):
     """ lists Docker containers
 
     :all_: show all containers or not(default shows just running)
@@ -78,4 +78,4 @@ def query_container(name):
 
     """
     out, _ = ls_containers(all_=True, quiet=True, filters='name={}'.format(name))
-    return out
+    return None if out == '' else out

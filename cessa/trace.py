@@ -11,9 +11,11 @@ This module implements container class and corresponding methods for tracing con
 """
 
 import subprocess
-import docker
 import os.path
 import logging
+
+from time import sleep
+from cessa import docker
 
 class Container(object):
 
@@ -52,6 +54,7 @@ class Container(object):
                              stdout = subprocess.PIPE,
                              stderr = subprocess.PIPE,
                              universal_newlines = True)
+        sleep(0.1)
         if None != p.poll() > 0:
             _, err = p.communicate()
             raise RuntimeError('Unable to run container {} with command \'{}\''.format(self.name, cmd), err)
@@ -123,7 +126,7 @@ def trace(container, trace_file):
         container.run()
         container.exec_workload()
         sysdigp.kill()
-        container.kill()
+        container.remove()
     except Exception as e:
         print(logging.exception(e))
         raise RuntimeError('Unable to trace container \'{}\''.format(container.name))
