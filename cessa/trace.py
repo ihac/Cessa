@@ -13,6 +13,7 @@ This module implements container class and corresponding methods for tracing con
 import subprocess
 import docker
 import os.path
+import logging
 
 class Container(object):
 
@@ -52,12 +53,13 @@ class Container(object):
                              stderr = subprocess.PIPE,
                              universal_newlines = True)
         if None != p.poll() > 0:
-            raise RuntimeError('Unable to run container {} with command \'{}\''.format(self.name, cmd), p.stderr)
+            _, err = p.communicate()
+            raise RuntimeError('Unable to run container {} with command \'{}\''.format(self.name, cmd), err)
         return p
 
     def exec_workload(self):
         """ execute the workload script of container
-        :returns: returncode of workload script
+        :returns: None
 
         """
         if self.workload == None:
@@ -73,7 +75,6 @@ class Container(object):
         _, err = p.communicate()
         if returncode != 0:
             raise RuntimeError('Failed to run workload script \'{}\''.format(self.workload), err)
-        return returncode
 
     def remove(self, force=True):
         """ removes container
@@ -90,12 +91,44 @@ class Container(object):
         if p.returncode != 0:
             raise RuntimeError('Unable to remove container {} with command \'{}\''.format(self.name, cmd), p.stderr)
 
+def start_sysdig(container_name, out_fp):
+    """ starts sysdig to trace syscalls.
 
-def trace(container):
-    """TODO: Docstring for trace.
-
-    :container: TODO
-    :returns: TODO
+    :container_name: container name
+    :out_fp: file object for storing traced syscalls
+    :returns: Popen object
 
     """
-    pass
+    cmd = ['sysdig', 'container.name = {}'.format(container_name), 'and', 'syscall.type exists']
+    p = subprocess.Popen(cmd,
+                         stdout = out_fp,
+                         stderr = subprocess.PIPE,
+                         universal_newlines = True)
+    if None != p.poll() > 0:
+        _, err = p.communicate()
+        raise RuntimeError('Unable to start sysdig with command \'{}\''.format(cmd), err)
+    return p
+
+def trace(container, trace_file):
+    """ uses sysdig to trace container's syscall with executing workload script.
+
+    :container: container to be traced
+    :trace_file: file path for storing traced syscalls
+    :returns: None
+
+    """
+    # two exceptions here: start_sysdig error and open_file error. Catch them!
+    try:
+        sysdigp = start_sysdig(container.name, open(trace_file, 'w'))
+        container.run()
+        container.exec_workload()
+        sysdigp.kill()
+        container.kill()
+    except Exception as e:
+        print(logging.exception(e))
+        raise RuntimeError('Unable to trace container \'{}\''.format(container.name))
+
+
+
+
+
