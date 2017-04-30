@@ -12,6 +12,7 @@ This module implements container class and corresponding methods for tracing con
 
 import subprocess
 import docker
+import os.path
 
 class Container(object):
 
@@ -36,7 +37,7 @@ class Container(object):
         """ runs container
 
         :with_seccomp: whether to use seccomp profile
-        :returns: None
+        :returns: Popen object
 
         """
         cmd = ['docker', 'run']
@@ -46,26 +47,48 @@ class Container(object):
         if self.opts != None:
             cmd += self.opts
         cmd.append(self.image_id)
+        p = subprocess.Popen(cmd,
+                             stdout = subprocess.PIPE,
+                             stderr = subprocess.PIPE,
+                             universal_newlines = True)
+        if None != p.poll() > 0:
+            raise RuntimeError('Unable to run container {} with command \'{}\''.format(self.name, cmd), p.stderr)
+        return p
+
+    def exec_workload(self):
+        """ execute the workload script of container
+        :returns: returncode of workload script
+
+        """
+        if self.workload == None:
+            raise RuntimeError('No workload script specified for container \'{}\''.format(self.name))
+        if os.path.isfile(self.workload):
+            raise RuntimeError('Workload script \'{}\' not exists'.format(self.workload))
+        cmd = [self.workload]
+        p = subprocess.Popen(cmd,
+                             stdout = subprocess.PIPE,
+                             stderr = subprocess.PIPE,
+                             universal_newlines = True)
+        returncode = p.wait()
+        _, err = p.communicate()
+        if returncode != 0:
+            raise RuntimeError('Failed to run workload script \'{}\''.format(self.workload), err)
+        return returncode
+
+    def remove(self, force=True):
+        """ removes container
+        :returns: None
+
+        """
+        cmd = ['docker', 'rm']
+        if force: cmd.append('-f')
+        cmd.append(self.name)
         p = subprocess.run(cmd,
                            stdout = subprocess.PIPE,
                            stderr = subprocess.PIPE,
                            universal_newlines = True)
         if p.returncode != 0:
-            raise RuntimeError('Unable to run container {} with command \'{}\''.format(self.name, cmd), p.stderr)
-
-    def exec_workload(self):
-        """TODO: Docstring for exec_workload.
-        :returns: TODO
-
-        """
-        pass
-
-    def kill(self):
-        """TODO: Docstring for kill.
-        :returns: TODO
-
-        """
-        pass
+            raise RuntimeError('Unable to remove container {} with command \'{}\''.format(self.name, cmd), p.stderr)
 
 
 def trace(container):
