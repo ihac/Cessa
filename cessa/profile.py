@@ -24,12 +24,13 @@ class Seccomp(object):
         self.arch_map = []
         self.syscalls = []
 
-    def load_rule(self, rule_list):
+    def __load_rule(self, rule):
         """ loads rule into seccomp profile
 
-        :rule_list: list of rule object
+        :rule: limit rule
         :returns: None
 
         """
+
         pass
 

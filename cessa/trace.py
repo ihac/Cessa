@@ -36,6 +36,36 @@ class Container(object):
         self.workload = None
         self.seccomp = None
 
+    def set_option(self, opts):
+        """ sets options for running container without checking their correctness!
+
+        :opts: options
+        :returns: None
+        """
+        self.opts += opts
+
+    def set_workload(self, script_file):
+        """ sets workload script for testing container.
+
+        :script_file: EXECUTABLE workload script file(absolute path)
+        :returns: None
+
+        """
+        if os.path.isfile(script_file):
+            raise RuntimeError('Workload script \'{}\' not exists'.format(script_file))
+        self.workload = script_file
+
+    def set_seccomp(self, profile):
+        """ sets seccomp profile for limiting container.
+
+        :profile: seccomp profile(path)
+        :returns: None
+
+        """
+        if os.path.isfile(profile):
+            raise RuntimeError('Seccomp profile \'{}\' not exists'.format(profile))
+        self.seccomp = profile
+
     def run(self, with_seccomp=False):
         """ runs container
 
@@ -47,7 +77,7 @@ class Container(object):
         if with_seccomp and self.seccomp != None:
             cmd += ['--security-opt', 'seccomp={}'.format(self.seccomp)]
         cmd += ['--name', self.name]
-        if self.opts != None:
+        if len(self.opts) != 0:
             cmd += self.opts
         cmd.append(self.image_id)
         p = subprocess.Popen(cmd,
