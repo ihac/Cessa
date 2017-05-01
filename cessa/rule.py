@@ -26,6 +26,23 @@ class Rule(object):
         self.action = action
         self.args = []
 
+    def __str__(self):
+        output = 'Syscall {}'.format(self.syscall)
+
+        action_str = {
+            config.Action.KILL: 'will be KILLed',
+            config.Action.TRAP: 'will be TRAPed',
+            config.Action.ERRNO: 'will be ERRNOed',
+            config.Action.TRACE: 'will be TRACEd',
+            config.Action.ALLOW: 'will be ALLOWed'
+        }.get(self.action, None)
+        output += '{} when '.format(action_str)
+
+        num = len(self.args)
+        for i in range(num):
+            output += '{} and '.format(self.args[i]) if i < num - 1 else '{}.'.format(self.args[i])
+        return output
+
     def add_condition(self, cond):
         """ adds argument condition.
 
@@ -39,6 +56,7 @@ class Rule(object):
                 if arg.index == cond.index:
                     raise ValueError('Unable to add multiple conditions based on the same argument owing to the limitation of libseccomp')
         self.args.append(cond)
+
 
 class Condition(object):
 
@@ -82,3 +100,11 @@ class Condition(object):
 
         return '{} argument {} {}'.format(index_str, op_str, value_str)
 
+def gen_rules(arg1):
+    """TODO: Docstring for gen_rules.
+
+    :arg1: TODO
+    :returns: TODO
+
+    """
+    pass

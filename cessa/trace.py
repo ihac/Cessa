@@ -13,7 +13,7 @@ This module implements container class and corresponding methods for tracing con
 import subprocess
 import os.path
 import logging
-
+from os import makedirs
 from time import sleep
 from cessa import docker
 
@@ -161,7 +161,48 @@ def trace(container, trace_file):
         print(logging.exception(e))
         raise RuntimeError('Unable to trace container \'{}\''.format(container.name))
 
+def data_preprocessing(trace_file, out_dir):
+    """ preprocesses trace file and separates syscall records by sort-uniq
 
+    :trace_file: file with syscall trace
+    :out_dir: output directory for separated syscall records
+    :returns: None
+
+    """
+    if not os.path.isdir(out_dir):
+        raise ValueError('\'{}\' is not a directory'.format(out_dir))
+    syscall_info = {}
+    try:
+        for line in open(trace_file, 'r'):
+            mark, name, *args = line.split()[5:]
+            # '>' means syscall entry, '<' means syscall return
+            if mark == '>':
+                if syscall_info.get(name, None) == None:
+                    syscall_info[name] = [args]
+                else:
+                    syscall_info[name].append(args)
+        # dump into file
+        # then, sort and uniq
+        for name, args_list in syscall_info.items():
+            syscall_dir = os.path.join(out_dir, name)
+            syscall_file = os.path.join(syscall_dir, 'args.list')
+            if not os.path.exists(syscall_dir):
+                makedirs(syscall_dir)
+            with open(syscall_file, 'w') as fp:
+                for args in args_list:
+                    if len(args) != 0: fp.write('{}\n'.format(' '.join(args)))
+
+            syscall_uniq_file = os.path.join(syscall_dir, 'args.uniq.list')
+            cmd = ['sort {} | uniq -c | sort -nr > {}'.format(syscall_file, syscall_uniq_file)]
+            p = subprocess.run(cmd,
+                               shell = True,
+                               stdout = subprocess.PIPE,
+                               stderr = subprocess.PIPE,
+                               universal_newlines = True)
+            if p.returncode != 0:
+                raise RuntimeError('Unable to sort syscall records with command \'{}\''.format(cmd))
+    except Exception as e:
+        raise e
 
 
 
