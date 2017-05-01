@@ -18,9 +18,18 @@ class Seccomp(object):
     """
 
     def __init__(self, action):
+        # TODO check whether action is legal
         self.default_action = action
         self.architectures = []
         self.arch_map = []
         self.syscalls = []
 
-    def
+    def load_rule(self, rule_list):
+        """ loads rule into seccomp profile
+
+        :rule_list: list of rule object
+        :returns: None
+
+        """
+        pass
+

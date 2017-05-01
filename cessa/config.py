@@ -10,48 +10,42 @@ This module defines all configuration constants for seccomp profile.
 
 """
 
-class Action(object):
+from enum import Enum
 
-    """Defines actions for seccomp rules
+"""Defines actions for seccomp rules
+"""
+Action = Enum('Action', ['KILL',
+                         'TRAP',
+                         'ERRNO',
+                         'TRACE',
+                         'ALLOW'])
 
-    """
-    KILL  = 'SCMP_ACT_KILL'
-    TRAP  = 'SCMP_ACT_TRAP'
-    ERRNO = 'SCMP_ACT_ERRNO'
-    TRACE = 'SCMP_ACT_TRACE'
-    ALLOW = 'SCMP_ACT_ALLOW'
+"""Defines architectures
+"""
+Arch = Enum('Arch', ['X86',
+                     'X86_64',
+                     'X32',
+                     'ARM',
+                     'AARCH64',
+                     'MIPS',
+                     'MIPS64',
+                     'MIPS64N32',
+                     'MIPSEL',
+                     'MIPSEL64',
+                     'MIPSEL64N32',
+                     'PPC',
+                     'PPC64',
+                     'PPC64LE',
+                     'S390',
+                     'S390X'])
 
-class Arch(object):
+"""Defines operators for syscall arguments
+"""
+Operator = Enum('Operator', ['NOT_EQUAL',
+                             'LESS_THAN',
+                             'LESS_EQUAL',
+                             'EQUAL_TO',
+                             'GREATER_EQUAL',
+                             'GREATER_THAN',
+                             'MASKED_EQUAL'])
 
-    """Defines architectures
-
-    """
-    X86         = 'SCMP_ARCH_X86'
-    X86_64      = 'SCMP_ARCH_X86_64'
-    X32         = 'SCMP_ARCH_X32'
-    ARM         = 'SCMP_ARCH_ARM'
-    AARCH64     = 'SCMP_ARCH_AARCH64'
-    MIPS        = 'SCMP_ARCH_MIPS'
-    MIPS64      = 'SCMP_ARCH_MIPS64'
-    MIPS64N32   = 'SCMP_ARCH_MIPS64N32'
-    MIPSEL      = 'SCMP_ARCH_MIPSEL'
-    MIPSEL64    = '_ARCH_MIPSEL64'
-    MIPSEL64N32 = '_ARCH_MIPSEL64N32'
-    PPC         = '_ARCH_PPC'
-    PPC64       = '_ARCH_PPC64'
-    PPC64LE     = '_ARCH_PPC64LE'
-    S390        = '_ARCH_S390'
-    S390X       = '_ARCH_S390X'
-
-class Operator(object):
-
-    """Defines operators for syscall arguments
-
-    """
-    NOT_EQUAL     = 'SCMP_CMP_NE'
-    LESS_THAN     = 'SCMP_CMP_LT'
-    LESS_EQUAL    = 'SCMP_CMP_LE'
-    EQUAL_TO      = 'SCMP_CMP_EQ'
-    GREATER_EQUAL = 'SCMP_CMP_GE'
-    GREATER_THAN  = 'SCMP_CMP_GT'
-    MASKED_EQUAL  = 'SCMP_MASKED_EQ'
