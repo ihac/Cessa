@@ -1,5 +1,14 @@
-all_value(socket_domain, (af_local, af_inet, af_inet6, af_ipx, af_netlink, af_x25, af_ax25, af_atmpvc, af_appletalk, af_packet, af_alg))
-relevant(ipv4, (af_inet, af_local))
-relevant(ipv6, (af_inet6, af_local))
-conflicting(ipv4, (af_inet6))
-conflicting(ipv6, (af_inet))
+## Application type
+# Web, Database
+relevant(Web, (AF_LOCAL, AF_INET, AF_INET6))
+
+## Detail
+# IPv4, IPv6
+relevant(IPv4, (AF_INET, AF_LOCAL))
+relevant(IPv6, (AF_INET6, AF_LOCAL))
+relevant(Novell, (AF_IPX))
+conflicting(IPv4, (AF_INET6))
+conflicting(IPv6, (AF_INET))
+
+relevant(TCP, (SOCK_STREAM))
+relevant(UDP, (SOCK_DGRAM))

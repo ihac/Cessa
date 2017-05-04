@@ -1,30 +1,38 @@
-range1
-    use accurate_values($argument, $label, $value_tuple)
+strict_mode_1
+    use accurate_value_tuple($argument, $label, $value_tuple)
     when
         python value_list = []
         argument.relevant($label, $value_relevant_tuple)
-        argument.all_value($argument, $value_total_tuple)
+        syscall.all_value($argument, $value_total_tuple)
         forall
             $value in $value_relevant_tuple
             $value in $value_total_tuple
             python value_list.append($value)
         $value_tuple = tuple(value_list)
 
-range2
+strict_mode_2
     use accurate_value($argument, $label, $value)
     when
         argument.relevant($label, $value_relevant_tuple)
-        argument.all_value($argument, $value_total_tuple)
+        syscall.all_value($argument, $value_total_tuple)
         $value in $value_relevant_tuple
         $value in $value_total_tuple
 
-range3
-    use test($argument, $label, $value)
+loose_mode_1
+    use possible_value_tuple($argument, $label, $value_tuple)
     when
-        argument.relevant($label, $value_relevant_tuple)
-        check $value in $value_relevant_tuple
+        syscall.all_value($argument, $value_total_tuple)
+        python value_set = set($value_total_tuple)
+        argument.conflicting($label, $value_conflicting_value)
+        forall
+            $value in $value_conflicting_value
+            python value_set.remove($value)
+        $value_tuple = tuple(value_set)
 
-range4
-    use test2($label, $value)
+loose_mode_2
+    use possible_value($argument, $label, $value)
     when
-        argument.relevant($label, $value)
+        syscall.all_value($argument, $value_total_tuple)
+        argument.conflicting($label, $value_conflicting_value)
+        $value in $value_total_tuple
+        check $value not in $value_conflicting_value
