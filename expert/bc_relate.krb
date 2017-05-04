@@ -1,0 +1,30 @@
+range1
+    use accurate_values($argument, $label, $value_tuple)
+    when
+        python value_list = []
+        argument.relevant($label, $value_relevant_tuple)
+        argument.all_value($argument, $value_total_tuple)
+        forall
+            $value in $value_relevant_tuple
+            $value in $value_total_tuple
+            python value_list.append($value)
+        $value_tuple = tuple(value_list)
+
+range2
+    use accurate_value($argument, $label, $value)
+    when
+        argument.relevant($label, $value_relevant_tuple)
+        argument.all_value($argument, $value_total_tuple)
+        $value in $value_relevant_tuple
+        $value in $value_total_tuple
+
+range3
+    use test($argument, $label, $value)
+    when
+        argument.relevant($label, $value_relevant_tuple)
+        check $value in $value_relevant_tuple
+
+range4
+    use test2($label, $value)
+    when
+        argument.relevant($label, $value)

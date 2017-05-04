@@ -1,0 +1,5 @@
+all_value(socket_domain, (af_local, af_inet, af_inet6, af_ipx, af_netlink, af_x25, af_ax25, af_atmpvc, af_appletalk, af_packet, af_alg))
+relevant(ipv4, (af_inet, af_local))
+relevant(ipv6, (af_inet6, af_local))
+conflicting(ipv4, (af_inet6))
+conflicting(ipv6, (af_inet))
