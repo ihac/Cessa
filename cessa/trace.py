@@ -161,22 +161,24 @@ def trace(container, trace_file):
         print(logging.exception(e))
         raise RuntimeError('Unable to trace container \'{}\''.format(container.name))
 
-def data_preprocessing(trace_file, out_dir):
+def data_preprocessing(trace_file, out_dir='.'):
     """ preprocesses trace file and separates syscall records by sort-uniq
 
     :trace_file: file with syscall trace
     :out_dir: output directory for separated syscall records
-    :returns: None
+    :returns: syscall list
 
     """
     if not os.path.isdir(out_dir):
         raise ValueError('\'{}\' is not a directory'.format(out_dir))
     syscall_info = {}
+    syscall_list = set()
     try:
         for line in open(trace_file, 'r'):
             mark, name, *args = line.split()[5:]
             # '>' means syscall entry, '<' means syscall return
             if mark == '>':
+                syscall_list.add(name)
                 if syscall_info.get(name, None) == None:
                     syscall_info[name] = [args]
                 else:
@@ -203,6 +205,7 @@ def data_preprocessing(trace_file, out_dir):
                 raise RuntimeError('Unable to sort syscall records with command \'{}\''.format(cmd))
     except Exception as e:
         raise e
+    return syscall_list
 
 
 
