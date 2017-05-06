@@ -1,3 +1,8 @@
+arg_type
+    use has_range($argument)
+    when
+        syscall.all_value($argument, $value_total_tuple)
+
 strict_mode_1
     use accurate_value_tuple($argument, $label, $value_tuple)
     when

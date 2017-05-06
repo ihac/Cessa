@@ -5,6 +5,31 @@ from pyke import contexts, pattern, bc_rule
 pyke_version = '1.1.1'
 compiler_version = 1
 
+def arg_type(rule, arg_patterns, arg_context):
+  engine = rule.rule_base.engine
+  patterns = rule.goal_arg_patterns()
+  if len(arg_patterns) == len(patterns):
+    context = contexts.bc_context(rule)
+    try:
+      if all(map(lambda pat, arg:
+                   pat.match_pattern(context, context,
+                                     arg, arg_context),
+                 patterns,
+                 arg_patterns)):
+        rule.rule_base.num_bc_rules_matched += 1
+        with engine.prove('syscall', 'all_value', context,
+                          (rule.pattern(0),
+                           rule.pattern(1),)) \
+          as gen_1:
+          for x_1 in gen_1:
+            assert x_1 is None, \
+              "bc_relate.arg_type: got unexpected plan from when clause 1"
+            rule.rule_base.num_bc_rule_successes += 1
+            yield
+        rule.rule_base.num_bc_rule_failures += 1
+    finally:
+      context.done()
+
 def strict_mode_1(rule, arg_patterns, arg_context):
   engine = rule.rule_base.engine
   patterns = rule.goal_arg_patterns()
@@ -195,6 +220,13 @@ def loose_mode_2(rule, arg_patterns, arg_context):
 def populate(engine):
   This_rule_base = engine.get_create('bc_relate')
   
+  bc_rule.bc_rule('arg_type', This_rule_base, 'has_range',
+                  arg_type, None,
+                  (contexts.variable('argument'),),
+                  (),
+                  (contexts.variable('argument'),
+                   contexts.variable('value_total_tuple'),))
+  
   bc_rule.bc_rule('strict_mode_1', This_rule_base, 'accurate_value_tuple',
                   strict_mode_1, None,
                   (contexts.variable('argument'),
@@ -249,28 +281,30 @@ def populate(engine):
 Krb_filename = '../bc_relate.krb'
 Krb_lineno_map = (
     ((14, 18), (2, 2)),
-    ((20, 20), (4, 4)),
-    ((21, 27), (5, 5)),
-    ((28, 34), (6, 6)),
-    ((36, 36), (8, 8)),
-    ((41, 41), (9, 9)),
-    ((45, 45), (10, 10)),
-    ((52, 52), (11, 11)),
-    ((68, 72), (14, 14)),
-    ((74, 80), (16, 16)),
-    ((81, 87), (17, 17)),
-    ((89, 89), (18, 18)),
-    ((94, 94), (19, 19)),
-    ((114, 118), (22, 22)),
-    ((120, 126), (24, 24)),
-    ((127, 127), (25, 25)),
-    ((128, 134), (26, 26)),
-    ((136, 136), (28, 28)),
-    ((140, 140), (29, 29)),
-    ((145, 145), (30, 30)),
-    ((161, 165), (33, 33)),
-    ((167, 173), (35, 35)),
-    ((174, 180), (36, 36)),
-    ((182, 182), (37, 37)),
-    ((186, 186), (38, 38)),
+    ((20, 26), (4, 4)),
+    ((39, 43), (7, 7)),
+    ((45, 45), (9, 9)),
+    ((46, 52), (10, 10)),
+    ((53, 59), (11, 11)),
+    ((61, 61), (13, 13)),
+    ((66, 66), (14, 14)),
+    ((70, 70), (15, 15)),
+    ((77, 77), (16, 16)),
+    ((93, 97), (19, 19)),
+    ((99, 105), (21, 21)),
+    ((106, 112), (22, 22)),
+    ((114, 114), (23, 23)),
+    ((119, 119), (24, 24)),
+    ((139, 143), (27, 27)),
+    ((145, 151), (29, 29)),
+    ((152, 152), (30, 30)),
+    ((153, 159), (31, 31)),
+    ((161, 161), (33, 33)),
+    ((165, 165), (34, 34)),
+    ((170, 170), (35, 35)),
+    ((186, 190), (38, 38)),
+    ((192, 198), (40, 40)),
+    ((199, 205), (41, 41)),
+    ((207, 207), (42, 42)),
+    ((211, 211), (43, 43)),
 )

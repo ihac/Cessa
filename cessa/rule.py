@@ -12,12 +12,11 @@ This module implements limit rule class and corresponding interfaces.
 """
 
 import os
-import re
 import knowledge
 
+from cessa.trace import retrieve_arg_value
 from cessa.config import Action, Operator
-from cessa.knowledge import es_engine
-from pyke import goal
+from functools import partial
 
 class Rule(object):
 
@@ -127,27 +126,106 @@ def gen_rules(syscall_list, record_dir, ctype_file, level='easy'):
         raise ValueError('\'{}\' is not a legal level'.format(level))
     return gen_rules_f(syscall_list, record_dir, ctype_file)
 
-def _retrieve_arg_value(syscall, arg_record_file):
-    """ retrieves argument values from a preprocessed record file
+def _gen_multiple_rules(syscall, action, arg_index, op, value_list):
+    """ generates multiple rules(for the same argument and the same operator) automatically
 
-    :syscall: the name of system call
-    :arg_record_file: output file of data_preprocessing()
-    :returns: dictionary with key=combination of syscall name and arg name, value=set of arg value
+    :syscall: syscall name
+    :action: the action towards this rules
+    :arg_name: the index of argument
+    :op: operator
+    :value_list: value list of argument
+    :returns: rule list
 
     """
-    arg_value_dict = {}
-    for line in open(arg_record_file, 'r'):
-        _, *arg_list = line.split()
-        for arg in arg_list:
-            p = re.match("(\w+)=(\d+)\(.*)", arg)
-            if p == None:
-                continue
-            arg_name, arg_value = syscall+'_'+p.group(1), int(p.group(2))
-            if arg_value_dict.get(arg_name, None) == None:
-                arg_value_dict[arg_name] = {arg_value}
+    rule_list = []
+    for value in value_list:
+        rule = Rule(syscall, action)
+        rule.add_condition(Condition(arg_index, op, value))
+        rule_list.append(rule)
+    return rule_list
+
+def _gen_rules_range(syscall, arg_name, value_set):
+    """ generates rules for arguments with 'range' type
+
+    :syscall: syscall name
+    :arg_name: argument name
+    :value_set: argument value set recorded by sysdig
+    :returns: rule list
+
+    """
+    rule_list = []
+    arg_index = knowledge.get_index(arg_name)
+    gen_f = partial(_gen_multiple_rules, syscall, Action.ALLOW, arg_index)
+    if len(value_set) <= 3:
+        rule_list += gen_f(Operator.EQUAL_TO, value_set)
+    else:
+        all_value_range = knowledge.get_value_range(arg_name)
+        if len(value_set) >= len(all_value_range) - 3:
+            non_value_set = {x for x in all_value_range if x not in value_set}
+            rule_list += gen_f(Operator.EQUAL_TO, non_value_set)
+        else:
+            max_v, min_v = max(value_set), min(value_set)
+            smaller_num = len([v for v in all_value_range if v < min_v])
+            larger_num = len([v for v in all_value_range if v > max_v])
+            if smaller_num > larger_num:
+                rule_list += gen_f(Operator.GREATER_EQUAL, {min_v})
             else:
-                arg_value_dict[arg_name].add(arg_value)
-    return arg_value_dict
+                rule_list += gen_f(Operator.LESS_EQUAL, {max_v})
+    return rule_list
+
+def _gen_rules_fd(syscall, arg_name, value_set):
+    """ generates rules for arguments with 'fd' type
+
+    :syscall: syscall name
+    :arg_name: argument name
+    :value_set: argument value set recorded by sysdig
+    :returns: rule list
+
+    """
+    arg_index = knowledge.get_index(arg_name)
+    max_fd = 1 << max(value_set).bit_length()
+    return _gen_multiple_rules(syscall, Action.ALLOW, arg_index, Operator.LESS_THAN, {max_fd})
+
+def _gen_rules_bufsize(syscall, arg_name, value_set):
+    """ generates rules for arguments with 'buf_size' type
+
+    :syscall: syscall name
+    :arg_name: argument name
+    :value_set: argument value set recorded by sysdig
+    :returns: rule list
+
+    """
+    arg_index = knowledge.get_index(arg_name)
+    max_size = 1 << max(value_set).bit_length()
+    return _gen_multiple_rules(syscall, Action.ALLOW, arg_index, Operator.LESS_THAN, {max_size})
+
+def _gen_rules_bitwise(syscall, arg_name, value_set):
+    """ generates rules for arguments with 'buf_size' type
+
+    :syscall: syscall name
+    :arg_name: argument name
+    :value_set: argument value set recorded by sysdig
+    :returns: rule list
+
+    """
+    arg_index = knowledge.get_index(arg_name)
+    powers = 0;
+    for value in value_set:
+        all_powers = _powers_of_2(value)
+        for x in all_powers:
+            powers |= x
+    powers ^= int('0xFFFFFFFF', base=16)
+    rule = Rule(syscall, Action.ALLOW)
+    rule.add_condition(Condition(arg_index, Operator.MASKED_EQUAL, 0, powers))
+
+def _powers_of_2(num):
+    powers = []
+    i = 1
+    while (i <= num):
+        if i & num != 0:
+            powers.append(i)
+        i <<= 1
+    return powers
 
 def gen_easy_rules(syscall_list, *unused):
     return [Rule(syscall, Action.ALLOW) for syscall in syscall_list]
@@ -158,34 +236,24 @@ def gen_normal_rules(syscall_list, record_dir, *unused):
         syscall_dir = os.path.join(record_dir, syscall)
         if not os.path.isdir(syscall_dir):
             raise RuntimeError('\'{}\' is not a directory'.format(syscall_dir))
-        rule = Rule(syscall, Action.ALLOW)
         try:
-            #  ctype_list = knowledge.load_ctype(ctype_file)
-            arg_value_dict = _retrieve_arg_value(syscall, os.path.join(syscall_dir, 'args.uniq.list'))
-            for arg_name, arg_value_set = arg_value_dict.items():
+            arg_value_dict = retrieve_arg_value(syscall, os.path.join(syscall_dir, 'args.uniq.list'))
+            for arg_name, arg_value_set in arg_value_dict.items():
                 arg_type = knowledge.get_arg_type(arg_name)
-                arg_index = knowledge.get_index(arg_name)
                 if arg_type == 'pointer' or arg_type == 'no_range':
                     continue
                 if arg_type == 'range':
-                    all_value_range = knowledge.get_value_range(arg_name)
-                    if len(arg_value_set) <= 5:
-                        for value in arg_value_set:
-                            rule = Rule(syscall, Action.ALLOW)
-                            rule.add_condition(Condition(arg_index, Operator.EQUAL_TO, value))
-                            rule_list.append(rule)
-                    elif len(arg_value_set) >= len(all_value_range) - 5:
-                        for value in all_value_range:
-                            if value in arg_value_set:
-                                continue
-                            rule = Rule(syscall, Action.ALLOW)
-                            rule.add_condition(Condition(arg_index, Operator.NOT_EQUAL, value))
-                            rule_list.append(rule)
-                #  if len(arg_value_set) <= 5:
-                elif
+                    rule_list += _gen_rules_range(syscall, arg_name, arg_value_set)
+                elif arg_type == 'fd':
+                    rule_list += _gen_rules_fd(syscall, arg_name, arg_value_set)
+                elif arg_type == 'bufsize':
+                    rule_list += _gen_rules_bufsize(syscall, arg_name, arg_value_set)
+                elif arg_type == 'bitwise':
+                    rule_list += _gen_rules_bitwise(syscall, arg_name, arg_value_set)
+                # if arg_type == 'range':
+                # elif
         except Exception as e:
             raise e
-        rule_list.append(rule)
     return rule_list
 
 def gen_hard_rules(syscall_list, record_dir, ctype_file):

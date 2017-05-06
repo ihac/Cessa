@@ -208,4 +208,25 @@ def data_preprocessing(trace_file, out_dir='.'):
     return syscall_list
 
 
+def retrieve_arg_value(syscall, arg_record_file):
+    """ retrieves argument values from a preprocessed record file
+
+    :syscall: the name of system call
+    :arg_record_file: output file of data_preprocessing()
+    :returns: dictionary with key=combination of syscall name and arg name, value=set of arg value
+
+    """
+    arg_value_dict = {}
+    for line in open(arg_record_file, 'r'):
+        _, *arg_list = line.split()
+        for arg in arg_list:
+            p = re.match("(\w+)=(\d+)\(.*)", arg)
+            if p == None:
+                continue
+            arg_name, arg_value = syscall+'_'+p.group(1), int(p.group(2))
+            if arg_value_dict.get(arg_name, None) == None:
+                arg_value_dict[arg_name] = {arg_value}
+            else:
+                arg_value_dict[arg_name].add(arg_value)
+    return arg_value_dict
 
