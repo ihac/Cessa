@@ -139,11 +139,9 @@ def gen_normal_rules(syscall_list, record_dir, *unused):
             raise RuntimeError('\'{}\' is not a directory'.format(syscall_dir))
         try:
             arg_value_dict = retrieve_arg_value(syscall, os.path.join(syscall_dir, 'args.uniq.list'))
-            # print('gen_normal_rules {}'.format(syscall))
             no_arg_rule = True
             for arg_name, arg_value_set in arg_value_dict.items():
                 arg_type = knowledge.get_arg_type(arg_name)
-                print ('\t{} {}'.format(arg_name, arg_type))
                 f = {
                     'range': _gen_rules_range,
                     'fd': _gen_rules_fd,

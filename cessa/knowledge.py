@@ -2,20 +2,20 @@
 # encoding: utf-8
 
 from pyke import knowledge_engine
-es_engine = knowledge_engine.engine((None, 'cessa.compiled_knowledge'))
+es_engine = knowledge_engine.engine((None, 'expert.compiled_krb'))
 # es_engine = knowledge_engine.engine((None, 'cessa/compiled_knowledge'))
 
 es_engine.activate('bc_relate')
 
-def get_possible_value(syscall, arg_idx):
-    """TODO: Docstring for get_possible_value.
+# def get_possible_value(syscall, arg_idx):
+    # """TODO: Docstring for get_possible_value.
 
-    :syscall: TODO
-    :arg_idx: TODO
-    :returns: TODO
+    # :syscall: TODO
+    # :arg_idx: TODO
+    # :returns: TODO
 
-    """
-    pass
+    # """
+    # pass
 
 def get_value_range(arg_name):
     """ gets all possible value of argument if it has a value range.
