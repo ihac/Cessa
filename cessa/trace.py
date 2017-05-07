@@ -1,3 +1,4 @@
+# !/usr/bin/env python3
 # encoding: utf-8
 
 """
@@ -13,9 +14,14 @@ This module implements container class and corresponding methods for tracing con
 import subprocess
 import os.path
 import logging
+import shutil
+import re
 from os import makedirs
 from time import sleep
 from cessa import docker
+
+import json
+SYSDIG_CONF_FILE = 'expert/sysdig.json'
 
 class Container(object):
 
@@ -142,7 +148,7 @@ def start_sysdig(container_name, out_fp):
         raise RuntimeError('Unable to start sysdig with command \'{}\''.format(cmd), err)
     return p
 
-def trace(container, trace_file):
+def trace_syscall(container, trace_file):
     """ uses sysdig to trace container's syscall with executing workload script.
 
     :container: container to be traced
@@ -174,10 +180,12 @@ def data_preprocessing(trace_file, out_dir='.'):
     syscall_info = {}
     syscall_list = set()
     try:
+        sysdig_conf = load_sysdig_conf()
         for line in open(trace_file, 'r'):
             mark, name, *args = line.split()[5:]
             # '>' means syscall entry, '<' means syscall return
             if mark == '>':
+                name, _ = correct_syscall(name, None, sysdig_conf)
                 syscall_list.add(name)
                 if syscall_info.get(name, None) == None:
                     syscall_info[name] = [args]
@@ -188,8 +196,9 @@ def data_preprocessing(trace_file, out_dir='.'):
         for name, args_list in syscall_info.items():
             syscall_dir = os.path.join(out_dir, name)
             syscall_file = os.path.join(syscall_dir, 'args.list')
-            if not os.path.exists(syscall_dir):
-                makedirs(syscall_dir)
+            if os.path.exists(syscall_dir):
+                shutil.rmtree(syscall_dir)
+            makedirs(syscall_dir)
             with open(syscall_file, 'w') as fp:
                 for args in args_list:
                     if len(args) != 0: fp.write('{}\n'.format(' '.join(args)))
@@ -217,16 +226,43 @@ def retrieve_arg_value(syscall, arg_record_file):
 
     """
     arg_value_dict = {}
+    sysdig_conf = load_sysdig_conf()
     for line in open(arg_record_file, 'r'):
         _, *arg_list = line.split()
         for arg in arg_list:
-            p = re.match("(\w+)=(\d+)\(.*)", arg)
+            p = re.match("(\w+)=(\d+).*", arg)
             if p == None:
                 continue
             arg_name, arg_value = syscall+'_'+p.group(1), int(p.group(2))
+            _, arg_name = correct_syscall(syscall, arg_name, sysdig_conf)
             if arg_value_dict.get(arg_name, None) == None:
                 arg_value_dict[arg_name] = {arg_value}
             else:
                 arg_value_dict[arg_name].add(arg_value)
     return arg_value_dict
 
+def load_sysdig_conf():
+    """ loads sysdig config into json object
+
+    :returns: JSON object
+
+    """
+    return json.load(open(SYSDIG_CONF_FILE, 'r'))
+
+def correct_syscall(syscall, arg, conf):
+    """ corrects syscall name and argument name
+    This method makes sense because sysdig produces syscall/argument names which are conflicting with linux man page.
+
+    :syscall: syscall name
+    :arg: argument name
+    :returns: correct syscall and correct arg
+
+    """
+    if conf['correct'].get(syscall, None) == None:
+        return syscall, arg
+    syscall_conf = conf['correct'][syscall]
+    syscall = syscall_conf['name']
+
+    if arg == None or syscall_conf['arguments'].get(arg, None) == None:
+        return syscall, arg
+    return syscall, syscall_conf['arguments'][arg]

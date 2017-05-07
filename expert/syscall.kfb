@@ -1,3 +1,34 @@
+# 0
+# ssize_t read(int fd, void *buf, size_t count);
+arg_list(read, read_fd, read_buf, read_count)
+arg_index(read_fd, 0)
+arg_index(read_buf, 1)
+arg_index(read_count, 2)
+arg_type(read_fd, fd)
+arg_type(read_buf, pointer)
+arg_type(read_count, buf_size)
+
+# 1
+# ssize_t write(int fd, const void *buf, size_t count);
+arg_list(write, write_fd, write_buf, write_count)
+arg_index(write_fd, 0)
+arg_index(write_buf, 1)
+arg_index(write_count, 2)
+arg_type(write_fd, fd)
+arg_type(write_buf, pointer)
+arg_type(write_count, buf_size)
+
+# 2
+# int open(const char *pathname, int flags);
+# int open(const char *pathname, int flags, mode_t mode);
+arg_list(open, open_pathname, open_flags, open_mode)
+arg_index(open_pathname, 0)
+arg_index(open_flags, 1)
+arg_index(open_mode, 2)
+arg_type(open_pathname, pointer)
+arg_type(open_flags, bitwise)
+arg_type(open_mode, bitwise)
+
 # int socket(int domain, int type, int protocol);
 arg_list(socket, socket_domain, socket_type, socket_protocol)
 arg_index(socket_domain, 0)

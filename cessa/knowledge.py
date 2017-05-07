@@ -2,7 +2,10 @@
 # encoding: utf-8
 
 from pyke import knowledge_engine
-es_engine = knowledge_engine.engine('__file__')
+es_engine = knowledge_engine.engine((None, 'cessa.compiled_knowledge'))
+# es_engine = knowledge_engine.engine((None, 'cessa/compiled_knowledge'))
+
+es_engine.activate('bc_relate')
 
 def get_possible_value(syscall, arg_idx):
     """TODO: Docstring for get_possible_value.
@@ -38,7 +41,8 @@ def get_arg_type(arg_name):
     try:
         with es_engine.prove_goal('bc_relate.arg_type({}, $type)'.format(arg_name)) as gen:
             for var, _ in gen:
-                pass
+                return var['type']
+            return 'other'
     except:
         raise RuntimeError('Cannot prove goal in get_arg_type() with arg_name = \'{}\''.format(arg_name))
 
@@ -53,7 +57,8 @@ def get_value(c_macro):
     try:
         with es_engine.prove_goal('bc_relate.macro_value({}, $value)'.format(c_macro)) as gen:
             for var, _ in gen:
-                pass
+                return var['value']
+            return None
     except:
         raise RuntimeError('Cannot prove goal in get_value() with c_macro = \'{}\''.format(c_macro))
 
@@ -70,6 +75,7 @@ def get_index(arg_name):
     try:
         with es_engine.prove_goal('bc_relate.arg_index({}, $index)'.format(arg_name)) as gen:
             for var, _ in gen:
-                pass
+                return var['index']
+            return None
     except:
         raise RuntimeError('Cannot prove goal in get_index() with arg_name = \'{}\''.format(arg_name))

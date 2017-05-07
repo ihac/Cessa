@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 
 """
@@ -12,8 +12,8 @@ This module implements limit rule class and corresponding interfaces.
 """
 
 import os
-import knowledge
 
+from cessa import knowledge
 from cessa.trace import retrieve_arg_value
 from cessa.config import Action, Operator
 from functools import partial
@@ -33,17 +33,19 @@ class Rule(object):
         self.omit = False
 
     def __str__(self):
-        output = 'Syscall {}'.format(self.syscall)
+        output = 'Syscall {}'.format(self.name)
         action_str = {
-            Action.KILL: 'will be KILLed',
-            Action.TRAP: 'will be TRAPed',
-            Action.ERRNO: 'will be ERRNOed',
-            Action.TRACE: 'will be TRACEd',
-            Action.ALLOW: 'will be ALLOWed'
+            Action.KILL: ' will be KILLed',
+            Action.TRAP: ' will be TRAPed',
+            Action.ERRNO: ' will be ERRNOed',
+            Action.TRACE: ' will be TRACEd',
+            Action.ALLOW: ' will be ALLOWed'
         }.get(self.action, None)
-        output += '{} when '.format(action_str)
+        output += '{}'.format(action_str)
 
         num = len(self.args)
+        if num > 0:
+            output += ' when '
         for i in range(num):
             output += '{} and '.format(self.args[i]) if i < num - 1 else '{}.'.format(self.args[i])
         return output
@@ -125,6 +127,51 @@ def gen_rules(syscall_list, record_dir, ctype_file, level='easy'):
     if gen_rules_f == None:
         raise ValueError('\'{}\' is not a legal level'.format(level))
     return gen_rules_f(syscall_list, record_dir, ctype_file)
+
+def gen_easy_rules(syscall_list, *unused):
+    return [Rule(syscall, Action.ALLOW) for syscall in syscall_list]
+
+def gen_normal_rules(syscall_list, record_dir, *unused):
+    rule_list = []
+    for syscall in syscall_list:
+        syscall_dir = os.path.join(record_dir, syscall)
+        if not os.path.isdir(syscall_dir):
+            raise RuntimeError('\'{}\' is not a directory'.format(syscall_dir))
+        try:
+            arg_value_dict = retrieve_arg_value(syscall, os.path.join(syscall_dir, 'args.uniq.list'))
+            # print('gen_normal_rules {}'.format(syscall))
+            no_arg_rule = True
+            for arg_name, arg_value_set in arg_value_dict.items():
+                arg_type = knowledge.get_arg_type(arg_name)
+                print ('\t{} {}'.format(arg_name, arg_type))
+                f = {
+                    'range': _gen_rules_range,
+                    'fd': _gen_rules_fd,
+                    'bufsize': _gen_rules_bufsize,
+                    'bitwise': _gen_rules_bitwise,
+                }.get(arg_type, None)
+                if f != None:
+                    rule_list += f(syscall, arg_name, arg_value_set)
+                    no_arg_rule = False
+            if len(arg_value_dict) == 0 or no_arg_rule:
+                rule_list += gen_rules([syscall], record_dir, *unused)
+        except Exception as e:
+            raise e
+    return rule_list
+
+def gen_hard_rules(syscall_list, record_dir, ctype_file):
+    pass
+
+def gen_custom_rules(syscall_list, record_dir, *unused):
+    """ generates limit rules by asking user a set of questions
+
+    :syscall_list: TODO
+    :record_dir: TODO
+    :*unused: TODO
+    :returns: TODO
+
+    """
+    pass
 
 def _gen_multiple_rules(syscall, action, arg_index, op, value_list):
     """ generates multiple rules(for the same argument and the same operator) automatically
@@ -217,6 +264,7 @@ def _gen_rules_bitwise(syscall, arg_name, value_set):
     powers ^= int('0xFFFFFFFF', base=16)
     rule = Rule(syscall, Action.ALLOW)
     rule.add_condition(Condition(arg_index, Operator.MASKED_EQUAL, 0, powers))
+    return [rule]
 
 def _powers_of_2(num):
     powers = []
@@ -227,43 +275,3 @@ def _powers_of_2(num):
         i <<= 1
     return powers
 
-def gen_easy_rules(syscall_list, *unused):
-    return [Rule(syscall, Action.ALLOW) for syscall in syscall_list]
-
-def gen_normal_rules(syscall_list, record_dir, *unused):
-    rule_list = []
-    for syscall in syscall_list:
-        syscall_dir = os.path.join(record_dir, syscall)
-        if not os.path.isdir(syscall_dir):
-            raise RuntimeError('\'{}\' is not a directory'.format(syscall_dir))
-        try:
-            arg_value_dict = retrieve_arg_value(syscall, os.path.join(syscall_dir, 'args.uniq.list'))
-            for arg_name, arg_value_set in arg_value_dict.items():
-                arg_type = knowledge.get_arg_type(arg_name)
-                if arg_type == 'pointer' or arg_type == 'no_range':
-                    continue
-                if arg_type == 'range':
-                    rule_list += _gen_rules_range(syscall, arg_name, arg_value_set)
-                elif arg_type == 'fd':
-                    rule_list += _gen_rules_fd(syscall, arg_name, arg_value_set)
-                elif arg_type == 'bufsize':
-                    rule_list += _gen_rules_bufsize(syscall, arg_name, arg_value_set)
-                elif arg_type == 'bitwise':
-                    rule_list += _gen_rules_bitwise(syscall, arg_name, arg_value_set)
-        except Exception as e:
-            raise e
-    return rule_list
-
-def gen_hard_rules(syscall_list, record_dir, ctype_file):
-    pass
-
-def gen_custom_rules(syscall_list, record_dir, *unused):
-    """ generates limit rules by asking user a set of questions
-
-    :syscall_list: TODO
-    :record_dir: TODO
-    :*unused: TODO
-    :returns: TODO
-
-    """
-    pass

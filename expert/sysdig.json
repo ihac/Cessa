@@ -1,0 +1,66 @@
+{
+    "correct": {
+        "bind": {
+            "name": "bind",
+            "arguments": {
+                "fd": "sockfd"
+            }
+        },
+        "connect": {
+            "name": "connect",
+            "arguments": {
+                "fd": "sockfd"
+            }
+        },
+        "dup": {
+            "name": "dup",
+            "arguments": {
+                "fd": "oldfd"
+            }
+        },
+        "listen": {
+            "name": "listen",
+            "arguments": {
+                "fd": "sockfd"
+            }
+        },
+        "mkdir": {
+            "name": "mkdir",
+            "arguments": {
+                "path": "pathname"
+            }
+        },
+        "pread": {
+            "name": "pread64",
+            "arguments": {
+                "size": "count",
+                "pos": "offset"
+            }
+        },
+        "pwrite": {
+            "name": "pwrite64",
+            "arguments": {
+                "size": "count",
+                "pos": "offset"
+            }
+        },
+        "read": {
+            "name": "read",
+            "arguments": {
+                "size": "count"
+            }
+        },
+        "socket": {
+            "name": "socket",
+            "arguments": {
+                "proto": "protocol"
+            }
+        },
+        "socketpair": {
+            "name": "socketpair",
+            "arguments": {
+                "proto": "protocol"
+            }
+        }
+    }
+}

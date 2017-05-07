@@ -1,3 +1,8 @@
+get_all_value
+    use all_value($argument, $value_tuple)
+    when
+        syscall.all_value($argument, $value_tuple)
+
 get_type
     use arg_type($argument, $type)
     when
