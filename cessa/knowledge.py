@@ -51,7 +51,7 @@ def get_value(c_macro):
     """
     # my_goal = goal.compile('bc_relate.get_value($macro)')
     try:
-        with es_engine.prove_goal('bc_relate.get_value({}, $value)'.format(c_macro)) as gen:
+        with es_engine.prove_goal('bc_relate.macro_value({}, $value)'.format(c_macro)) as gen:
             for var, _ in gen:
                 pass
     except:
@@ -68,7 +68,7 @@ def get_index(arg_name):
 
     """
     try:
-        with es_engine.prove_goal('bc_relate.get_index({}, $index)'.format(arg_name)) as gen:
+        with es_engine.prove_goal('bc_relate.arg_index({}, $index)'.format(arg_name)) as gen:
             for var, _ in gen:
                 pass
     except:

@@ -250,8 +250,6 @@ def gen_normal_rules(syscall_list, record_dir, *unused):
                     rule_list += _gen_rules_bufsize(syscall, arg_name, arg_value_set)
                 elif arg_type == 'bitwise':
                     rule_list += _gen_rules_bitwise(syscall, arg_name, arg_value_set)
-                # if arg_type == 'range':
-                # elif
         except Exception as e:
             raise e
     return rule_list

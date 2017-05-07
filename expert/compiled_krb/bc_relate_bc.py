@@ -5,7 +5,7 @@ from pyke import contexts, pattern, bc_rule
 pyke_version = '1.1.1'
 compiler_version = 1
 
-def arg_type(rule, arg_patterns, arg_context):
+def get_type(rule, arg_patterns, arg_context):
   engine = rule.rule_base.engine
   patterns = rule.goal_arg_patterns()
   if len(arg_patterns) == len(patterns):
@@ -17,13 +17,63 @@ def arg_type(rule, arg_patterns, arg_context):
                  patterns,
                  arg_patterns)):
         rule.rule_base.num_bc_rules_matched += 1
-        with engine.prove('syscall', 'all_value', context,
+        with engine.prove('syscall', 'arg_type', context,
                           (rule.pattern(0),
                            rule.pattern(1),)) \
           as gen_1:
           for x_1 in gen_1:
             assert x_1 is None, \
-              "bc_relate.arg_type: got unexpected plan from when clause 1"
+              "bc_relate.get_type: got unexpected plan from when clause 1"
+            rule.rule_base.num_bc_rule_successes += 1
+            yield
+        rule.rule_base.num_bc_rule_failures += 1
+    finally:
+      context.done()
+
+def get_index(rule, arg_patterns, arg_context):
+  engine = rule.rule_base.engine
+  patterns = rule.goal_arg_patterns()
+  if len(arg_patterns) == len(patterns):
+    context = contexts.bc_context(rule)
+    try:
+      if all(map(lambda pat, arg:
+                   pat.match_pattern(context, context,
+                                     arg, arg_context),
+                 patterns,
+                 arg_patterns)):
+        rule.rule_base.num_bc_rules_matched += 1
+        with engine.prove('syscall', 'arg_index', context,
+                          (rule.pattern(0),
+                           rule.pattern(1),)) \
+          as gen_1:
+          for x_1 in gen_1:
+            assert x_1 is None, \
+              "bc_relate.get_index: got unexpected plan from when clause 1"
+            rule.rule_base.num_bc_rule_successes += 1
+            yield
+        rule.rule_base.num_bc_rule_failures += 1
+    finally:
+      context.done()
+
+def get_macro_value(rule, arg_patterns, arg_context):
+  engine = rule.rule_base.engine
+  patterns = rule.goal_arg_patterns()
+  if len(arg_patterns) == len(patterns):
+    context = contexts.bc_context(rule)
+    try:
+      if all(map(lambda pat, arg:
+                   pat.match_pattern(context, context,
+                                     arg, arg_context),
+                 patterns,
+                 arg_patterns)):
+        rule.rule_base.num_bc_rules_matched += 1
+        with engine.prove('macro', 'define', context,
+                          (rule.pattern(0),
+                           rule.pattern(1),)) \
+          as gen_1:
+          for x_1 in gen_1:
+            assert x_1 is None, \
+              "bc_relate.get_macro_value: got unexpected plan from when clause 1"
             rule.rule_base.num_bc_rule_successes += 1
             yield
         rule.rule_base.num_bc_rule_failures += 1
@@ -220,12 +270,29 @@ def loose_mode_2(rule, arg_patterns, arg_context):
 def populate(engine):
   This_rule_base = engine.get_create('bc_relate')
   
-  bc_rule.bc_rule('arg_type', This_rule_base, 'has_range',
-                  arg_type, None,
-                  (contexts.variable('argument'),),
+  bc_rule.bc_rule('get_type', This_rule_base, 'arg_type',
+                  get_type, None,
+                  (contexts.variable('argument'),
+                   contexts.variable('type'),),
                   (),
                   (contexts.variable('argument'),
-                   contexts.variable('value_total_tuple'),))
+                   contexts.variable('type'),))
+  
+  bc_rule.bc_rule('get_index', This_rule_base, 'arg_index',
+                  get_index, None,
+                  (contexts.variable('argument'),
+                   contexts.variable('index'),),
+                  (),
+                  (contexts.variable('argument'),
+                   contexts.variable('index'),))
+  
+  bc_rule.bc_rule('get_macro_value', This_rule_base, 'macro_value',
+                  get_macro_value, None,
+                  (contexts.variable('macro'),
+                   contexts.variable('value'),),
+                  (),
+                  (contexts.variable('macro'),
+                   contexts.variable('value'),))
   
   bc_rule.bc_rule('strict_mode_1', This_rule_base, 'accurate_value_tuple',
                   strict_mode_1, None,
@@ -283,28 +350,32 @@ Krb_lineno_map = (
     ((14, 18), (2, 2)),
     ((20, 26), (4, 4)),
     ((39, 43), (7, 7)),
-    ((45, 45), (9, 9)),
-    ((46, 52), (10, 10)),
-    ((53, 59), (11, 11)),
-    ((61, 61), (13, 13)),
-    ((66, 66), (14, 14)),
-    ((70, 70), (15, 15)),
-    ((77, 77), (16, 16)),
-    ((93, 97), (19, 19)),
-    ((99, 105), (21, 21)),
-    ((106, 112), (22, 22)),
-    ((114, 114), (23, 23)),
-    ((119, 119), (24, 24)),
-    ((139, 143), (27, 27)),
-    ((145, 151), (29, 29)),
-    ((152, 152), (30, 30)),
-    ((153, 159), (31, 31)),
-    ((161, 161), (33, 33)),
-    ((165, 165), (34, 34)),
-    ((170, 170), (35, 35)),
-    ((186, 190), (38, 38)),
-    ((192, 198), (40, 40)),
-    ((199, 205), (41, 41)),
-    ((207, 207), (42, 42)),
+    ((45, 51), (9, 9)),
+    ((64, 68), (12, 12)),
+    ((70, 76), (14, 14)),
+    ((89, 93), (17, 17)),
+    ((95, 95), (19, 19)),
+    ((96, 102), (20, 20)),
+    ((103, 109), (21, 21)),
+    ((111, 111), (23, 23)),
+    ((116, 116), (24, 24)),
+    ((120, 120), (25, 25)),
+    ((127, 127), (26, 26)),
+    ((143, 147), (29, 29)),
+    ((149, 155), (31, 31)),
+    ((156, 162), (32, 32)),
+    ((164, 164), (33, 33)),
+    ((169, 169), (34, 34)),
+    ((189, 193), (37, 37)),
+    ((195, 201), (39, 39)),
+    ((202, 202), (40, 40)),
+    ((203, 209), (41, 41)),
     ((211, 211), (43, 43)),
+    ((215, 215), (44, 44)),
+    ((220, 220), (45, 45)),
+    ((236, 240), (48, 48)),
+    ((242, 248), (50, 50)),
+    ((249, 255), (51, 51)),
+    ((257, 257), (52, 52)),
+    ((261, 261), (53, 53)),
 )

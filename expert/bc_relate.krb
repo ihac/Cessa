@@ -1,7 +1,17 @@
-arg_type
-    use has_range($argument)
+get_type
+    use arg_type($argument, $type)
     when
-        syscall.all_value($argument, $value_total_tuple)
+        syscall.arg_type($argument, $type)
+
+get_index
+    use arg_index($argument, $index)
+    when
+        syscall.arg_index($argument, $index)
+
+get_macro_value
+    use macro_value($macro, $value)
+    when
+        macro.define($macro, $value)
 
 strict_mode_1
     use accurate_value_tuple($argument, $label, $value_tuple)
