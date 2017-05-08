@@ -29,7 +29,7 @@ class Rule(object):
             raise ValueError('Action \'{}\' is unsupported or illegal. Use action in config.Action instead'.format(action))
         self.name = syscall
         self.action = action
-        self.args = []
+        self.conds = []
         self.omit = False
 
     def __str__(self):
@@ -43,11 +43,11 @@ class Rule(object):
         }.get(self.action, None)
         output += '{}'.format(action_str)
 
-        num = len(self.args)
+        num = len(self.conds)
         if num > 0:
             output += ' when '
         for i in range(num):
-            output += '{} and '.format(self.args[i]) if i < num - 1 else '{}.'.format(self.args[i])
+            output += '{} and '.format(self.conds[i]) if i < num - 1 else '{}.'.format(self.conds[i])
         return output
 
     def add_condition(self, cond):
@@ -58,11 +58,11 @@ class Rule(object):
 
         """
         # Be sure that at most one condition per argument is allowed for now.
-        if len(self.args) != 0:
-            for arg in self.args:
+        if len(self.conds) != 0:
+            for arg in self.conds:
                 if arg.index == cond.index:
                     raise ValueError('Unable to add multiple conditions based on the same argument owing to the limitation of libseccomp')
-        self.args.append(cond)
+        self.conds.append(cond)
 
 
 class Condition(object):
@@ -106,6 +106,17 @@ class Condition(object):
         value_str = str(self.value) if self.value2 == None else '{} with {}'.format(self.value, self.value2)
 
         return '{} argument {} {}'.format(index_str, op_str, value_str)
+
+def del_rules(rule_list, syscall):
+    """ deletes all rules based on the specified syscall from rule list
+
+    :rule_list: rule list
+    :syscall: syscall name
+    :returns: new rule list
+
+    """
+    return list(filter(lambda rule: rule.name != syscall, rule_list))
+
 
 def gen_rules(syscall_list, record_dir, ctype_file, level='easy'):
     """ generates limit rules according to the preprocessed syscall trace records.

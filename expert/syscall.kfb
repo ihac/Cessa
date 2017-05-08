@@ -29,6 +29,14 @@ arg_type(open_pathname, pointer)
 arg_type(open_flags, bitwise)
 arg_type(open_mode, bitwise)
 
+# 21
+# int access(const char *pathname, int mode);
+arg_list(access, access_pathname, access_mode)
+arg_index(access_pathname, 0)
+arg_index(access_mode, 1)
+arg_type(access_pathname, pointer)
+arg_type(access_mode, bitwise)
+
 # int socket(int domain, int type, int protocol);
 arg_list(socket, socket_domain, socket_type, socket_protocol)
 arg_index(socket_domain, 0)

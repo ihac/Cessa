@@ -69,7 +69,7 @@ class Container(object):
 
         """
         if os.path.isfile(profile):
-            raise RuntimeError('Seccomp profile \'{}\' not exists'.format(profile))
+            raise ValueError('Seccomp profile \'{}\' not exists'.format(profile))
         self.seccomp = profile
 
     def run(self, with_seccomp=False):
