@@ -57,7 +57,7 @@ class Container(object):
         :returns: None
 
         """
-        if os.path.isfile(script_file):
+        if not os.path.isfile(script_file):
             raise RuntimeError('Workload script \'{}\' not exists'.format(script_file))
         self.workload = script_file
 
@@ -68,7 +68,7 @@ class Container(object):
         :returns: None
 
         """
-        if os.path.isfile(profile):
+        if not os.path.isfile(profile):
             raise ValueError('Seccomp profile \'{}\' not exists'.format(profile))
         self.seccomp = profile
 
@@ -103,17 +103,18 @@ class Container(object):
         """
         if self.workload == None:
             raise RuntimeError('No workload script specified for container \'{}\''.format(self.name))
-        if os.path.isfile(self.workload):
+        if not os.path.isfile(self.workload):
             raise RuntimeError('Workload script \'{}\' not exists'.format(self.workload))
         cmd = [self.workload]
         p = subprocess.Popen(cmd,
                              stdout = subprocess.PIPE,
                              stderr = subprocess.PIPE,
                              universal_newlines = True)
-        returncode = p.wait()
-        _, err = p.communicate()
-        if returncode != 0:
-            raise RuntimeError('Failed to run workload script \'{}\''.format(self.workload), err)
+        return p.wait()
+        #returncode = p.wait()
+        #_, err = p.communicate()
+        #if returncode != 0:
+        #    raise RuntimeError('Failed to run workload script \'{}\''.format(self.workload), err)
 
     def remove(self, force=True):
         """ removes container
@@ -167,7 +168,7 @@ def trace_syscall(container, trace_file):
         print(logging.exception(e))
         raise RuntimeError('Unable to trace container \'{}\''.format(container.name))
 
-def data_preprocessing(trace_file, out_dir='.'):
+def data_preprocessing(trace_file, out_dir):
     """ preprocesses trace file and separates syscall records by sort-uniq
 
     :trace_file: file with syscall trace

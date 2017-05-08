@@ -16,7 +16,7 @@ import time
 from cessa.rule import del_rules, gen_rules
 from cessa.profile import dump_rules
 LOG_FILE = '/var/log/audit/audit.log'
-SYSTABLE_FILE = 'expert/syscall.table'
+SYSTABLE_FILE = 'expert/systable.list'
 
 def _get_seccomp_events(start_time):
     """ gets seccomp events from auditd log file
@@ -100,6 +100,7 @@ def adjust_seccomp(container, rule_list, record_dir):
                 error_syscall_set.add(int(p.group(1)))
         for sys_id in error_syscall_set:
             sys_name = syscall_name(systable, sys_id)
+            print('adjust \'{}\' to lower limit level'.format(sys_name))
             rule_list = del_rules(rule_list, sys_name)
             rule_list += gen_rules([sys_name], record_dir, None, level='easy')
         # replace original seccomp profiles with new rules

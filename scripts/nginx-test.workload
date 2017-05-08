@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sleep 3
+wget -qO- -T 1 -t 3 localhost:8080 >/dev/null 2>&1

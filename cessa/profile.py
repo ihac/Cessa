@@ -81,7 +81,7 @@ def dump_rules(seccomp_file, rule_list, default_action=Action.ERRNO, arch=Arch.X
 
     """
     seccomp = Seccomp(default_action)
-    seccomp.set_arch(arch)
+    seccomp.set_arch([arch])
     seccomp.set_rules(rule_list)
 
     try:
