@@ -15,7 +15,7 @@ import os
 
 from cessa import knowledge
 from cessa.trace import retrieve_arg_value
-from cessa.config import Action, Operator
+from cessa.config import Action, Operator, Level
 from functools import partial
 
 class Rule(object):
@@ -118,7 +118,7 @@ def del_rules(rule_list, syscall):
     return list(filter(lambda rule: rule.name != syscall, rule_list))
 
 
-def gen_rules(syscall_list, record_dir, ctype_file, level='easy'):
+def gen_rules(syscall_list, record_dir, ctype_file, level=Level.NAME):
     """ generates limit rules according to the preprocessed syscall trace records.
 
     :syscall_list: list of syscall names
@@ -130,19 +130,19 @@ def gen_rules(syscall_list, record_dir, ctype_file, level='easy'):
     if not os.path.isdir(record_dir):
         raise ValueError('\'{}\' is not a directory'.format(record_dir))
     gen_rules_f = {
-        'easy': gen_easy_rules,
-        'normal': gen_normal_rules,
-        'hard': gen_hard_rules,
-        'custom': gen_custom_rules
+        Level.NAME: gen_name_rules,
+        Level.ARG: gen_arg_rules,
+        Level.CTYPE: gen_ctype_rules,
+        Level.CUSTOM: gen_custom_rules
     }.get(level, None);
     if gen_rules_f == None:
         raise ValueError('\'{}\' is not a legal level'.format(level))
     return gen_rules_f(syscall_list, record_dir, ctype_file)
 
-def gen_easy_rules(syscall_list, *unused):
+def gen_name_rules(syscall_list, *unused):
     return [Rule(syscall, Action.ALLOW) for syscall in syscall_list]
 
-def gen_normal_rules(syscall_list, record_dir, *unused):
+def gen_arg_rules(syscall_list, record_dir, *unused):
     rule_list = []
     for syscall in syscall_list:
         syscall_dir = os.path.join(record_dir, syscall)
@@ -163,13 +163,15 @@ def gen_normal_rules(syscall_list, record_dir, *unused):
                     rule_list += f(syscall, arg_name, arg_value_set)
                     no_arg_rule = False
             if len(arg_value_dict) == 0 or no_arg_rule:
-                rule_list += gen_rules([syscall], record_dir, *unused)
+                rule_list += gen_rules([syscall], record_dir, *unused, level=Level.NAME)
         except Exception as e:
             raise e
     return rule_list
 
-def gen_hard_rules(syscall_list, record_dir, ctype_file):
-    pass
+def gen_ctype_rules(syscall_list, record_dir, ctype_file):
+    rule_list = []
+    return rule_list
+    # for rule k
 
 def gen_custom_rules(syscall_list, record_dir, *unused):
     """ generates limit rules by asking user a set of questions

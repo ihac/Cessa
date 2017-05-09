@@ -15,6 +15,7 @@ import re
 import time
 from cessa.rule import del_rules, gen_rules
 from cessa.profile import dump_rules
+from cessa.config import Level
 LOG_FILE = '/var/log/audit/audit.log'
 SYSTABLE_FILE = 'expert/systable.list'
 
@@ -74,7 +75,6 @@ def adjust_seccomp(container, rule_list, record_dir):
     :returns: container
 
     """
-    # gen_rules(syscall_list, record_dir, ctype_file, level='easy')
     if container.seccomp == None:
         raise ValueError('No seccomp profile is specified for container \'{}\''.format(container.name))
     if container.workload == None:
@@ -102,6 +102,6 @@ def adjust_seccomp(container, rule_list, record_dir):
             sys_name = syscall_name(systable, sys_id)
             print('adjust \'{}\' to lower limit level'.format(sys_name))
             rule_list = del_rules(rule_list, sys_name)
-            rule_list += gen_rules([sys_name], record_dir, None, level='easy')
+            rule_list += gen_rules([sys_name], record_dir, None, level=Level.EASY)
         # replace original seccomp profiles with new rules
         dump_rules(container.seccomp, rule_list)

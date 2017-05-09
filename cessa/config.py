@@ -10,7 +10,7 @@ This module defines all configuration constants for seccomp profile.
 
 """
 
-from enum import Enum
+from enum import Enum, unique
 
 """Defines actions for seccomp rules
 """
@@ -48,4 +48,32 @@ Operator = Enum('Operator', ['NOT_EQUAL',
                              'GREATER_EQUAL',
                              'GREATER_THAN',
                              'MASKED_EQUAL'])
+
+@unique
+class Level(Enum):
+
+    """ Represents the level of rule generation
+
+    """
+    NAME = 1
+    ARG = 2
+    CTYPE = 3
+    CUSTOM = 4
+
+    def __str__(self):
+        return 'Level-{}'.format(self.name)
+
+    def degrade(self, num=1):
+        new_value = self.value - num > 0
+        if new_value < Level.NAME.value:
+            new_value = Level.NAME.value
+        return Level(new_value)
+
+    def upgrade(self, num=1):
+        new_value = self.value + num
+        if new_value > Level.CUSTOM.value:
+            new_value = Level.CUSTOM.value
+        return Level(new_value)
+
+
 
