@@ -118,7 +118,7 @@ def del_rules(rule_list, syscall):
     return list(filter(lambda rule: rule.name != syscall, rule_list))
 
 
-def gen_rules(syscall_list, record_dir, ctype_file, level=Level.NAME):
+def gen_rules(syscall_list, record_dir, clabel_file, level=Level.NAME):
     """ generates limit rules according to the preprocessed syscall trace records.
 
     :syscall_list: list of syscall names
@@ -132,12 +132,12 @@ def gen_rules(syscall_list, record_dir, ctype_file, level=Level.NAME):
     gen_rules_f = {
         Level.NAME: gen_name_rules,
         Level.ARG: gen_arg_rules,
-        Level.CTYPE: gen_ctype_rules,
+        Level.CLABEL: gen_clabel_rules,
         Level.CUSTOM: gen_custom_rules
     }.get(level, None);
     if gen_rules_f == None:
         raise ValueError('\'{}\' is not a legal level'.format(level))
-    return gen_rules_f(syscall_list, record_dir, ctype_file)
+    return gen_rules_f(syscall_list, record_dir, clabel_file)
 
 def gen_name_rules(syscall_list, *unused):
     return [Rule(syscall, Action.ALLOW) for syscall in syscall_list]
@@ -168,7 +168,7 @@ def gen_arg_rules(syscall_list, record_dir, *unused):
             raise e
     return rule_list
 
-def gen_ctype_rules(syscall_list, record_dir, ctype_file):
+def gen_clabel_rules(syscall_list, record_dir, clabel_file):
     rule_list = []
     return rule_list
     # for rule k

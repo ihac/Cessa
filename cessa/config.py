@@ -12,42 +12,56 @@ This module defines all configuration constants for seccomp profile.
 
 from enum import Enum, unique
 
-"""Defines actions for seccomp rules
-"""
-Action = Enum('Action', ['KILL',
-                         'TRAP',
-                         'ERRNO',
-                         'TRACE',
-                         'ALLOW'])
+@unique
+class Action(Enum):
 
-"""Defines architectures
-"""
-Arch = Enum('Arch', ['X86',
-                     'X86_64',
-                     'X32',
-                     'ARM',
-                     'AARCH64',
-                     'MIPS',
-                     'MIPS64',
-                     'MIPS64N32',
-                     'MIPSEL',
-                     'MIPSEL64',
-                     'MIPSEL64N32',
-                     'PPC',
-                     'PPC64',
-                     'PPC64LE',
-                     'S390',
-                     'S390X'])
+    """ Defines actions for seccomp rules
 
-"""Defines operators for syscall arguments
-"""
-Operator = Enum('Operator', ['NOT_EQUAL',
-                             'LESS_THAN',
-                             'LESS_EQUAL',
-                             'EQUAL_TO',
-                             'GREATER_EQUAL',
-                             'GREATER_THAN',
-                             'MASKED_EQUAL'])
+    """
+    KILL = 1
+    TRAP = 2
+    ERRNO = 3
+    TRACE = 4
+    ALLOW = 5
+
+@unique
+class Arch(Enum):
+
+    """ Defines architectures
+
+    """
+    X86 = 1
+    X86_64 = 2
+    X32 = 3
+    ARM = 4
+    AARCH64 = 5
+    MIPS = 6
+    MIPS64 = 7
+    MIPS64N32 = 8
+    MIPSEL = 9
+    MIPSEL64 = 10
+    MIPSEL64N32 = 11
+    PPC = 12
+    PPC64 = 13
+    PPC64LE = 14
+    S390 = 15
+    S390X = 16
+
+
+@unique
+class Operator(Enum):
+
+    """ Defines operators for syscall arguments
+
+    """
+    NOT_EQUAL = 1
+    LESS_THAN = 2
+    LESS_EQUAL = 3
+    EQUAL_TO = 4
+    GREATER_EQUAL = 5
+    GREATER_THAN = 6
+    MASKED_EQUAL = 7
+
 
 @unique
 class Level(Enum):
@@ -57,7 +71,7 @@ class Level(Enum):
     """
     NAME = 1
     ARG = 2
-    CTYPE = 3
+    CLABEL = 3
     CUSTOM = 4
 
     def __str__(self):
