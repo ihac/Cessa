@@ -79,3 +79,12 @@ def get_index(arg_name):
             return None
     except:
         raise RuntimeError('Cannot prove goal in get_index() with arg_name = \'{}\''.format(arg_name))
+
+def get_related_args(arg_name_list):
+    """ get related set from the argument list if exists
+
+    :arg_name_list: argument name list
+    :returns: related set or None
+
+    """
+    return None

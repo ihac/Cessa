@@ -234,8 +234,9 @@ def retrieve_arg_value(syscall, arg_record_file):
             p = re.match("(\w+)=(\d+).*", arg)
             if p == None:
                 continue
-            arg_name, arg_value = syscall+'_'+p.group(1), int(p.group(2))
+            arg_name, arg_value = p.group(1), int(p.group(2))
             _, arg_name = correct_syscall(syscall, arg_name, sysdig_conf)
+            arg_name = syscall + '_' + arg_name
             if arg_value_dict.get(arg_name, None) == None:
                 arg_value_dict[arg_name] = {arg_value}
             else:

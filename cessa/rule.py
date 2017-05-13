@@ -12,6 +12,8 @@ This module implements limit rule class and corresponding interfaces.
 """
 
 import os
+import itertools
+import copy
 
 from cessa import knowledge
 from cessa.trace import retrieve_arg_value
@@ -61,7 +63,7 @@ class Rule(object):
         if len(self.conds) != 0:
             for arg in self.conds:
                 if arg.index == cond.index:
-                    raise ValueError('Unable to add multiple conditions based on the same argument owing to the limitation of libseccomp')
+                    raise ValueError('Unable to add multiple conditions based on the same argument owing to the limitation of libseccomp: adding condition {} to rule {}'.format(cond, self))
         self.conds.append(cond)
 
 
@@ -118,7 +120,12 @@ def del_rules(rule_list, syscall):
     return list(filter(lambda rule: rule.name != syscall, rule_list))
 
 
-def gen_rules(syscall_list, record_dir, clabel_file, level=Level.NAME):
+def gen_rules(syscall_list,
+              match_action=Action.ALLOW,
+              record_dir=None,
+              clabel_file=None,
+              level=Level.NAME):
+
     """ generates limit rules according to the preprocessed syscall trace records.
 
     :syscall_list: list of syscall names
@@ -127,6 +134,8 @@ def gen_rules(syscall_list, record_dir, clabel_file, level=Level.NAME):
     :returns: TODO
 
     """
+    if record_dir == None:
+        return gen_name_rules(syscall_list, match_action)
     if not os.path.isdir(record_dir):
         raise ValueError('\'{}\' is not a directory'.format(record_dir))
     gen_rules_f = {
@@ -137,36 +146,97 @@ def gen_rules(syscall_list, record_dir, clabel_file, level=Level.NAME):
     }.get(level, None);
     if gen_rules_f == None:
         raise ValueError('\'{}\' is not a legal level'.format(level))
-    return gen_rules_f(syscall_list, record_dir, clabel_file)
+    return gen_rules_f(syscall_list, match_action, record_dir, clabel_file)
 
-def gen_name_rules(syscall_list, *unused):
-    return [Rule(syscall, Action.ALLOW) for syscall in syscall_list]
+def gen_name_rules(syscall_list, match_action, *unused):
+    return [Rule(syscall, match_action) for syscall in syscall_list]
 
-def gen_arg_rules(syscall_list, record_dir, *unused):
+def gen_arg_rules(syscall_list,
+                  match_action,
+                  record_dir,
+                  *unused):
     rule_list = []
     for syscall in syscall_list:
-        syscall_dir = os.path.join(record_dir, syscall)
-        if not os.path.isdir(syscall_dir):
-            raise RuntimeError('\'{}\' is not a directory'.format(syscall_dir))
-        try:
-            arg_value_dict = retrieve_arg_value(syscall, os.path.join(syscall_dir, 'args.uniq.list'))
-            no_arg_rule = True
-            for arg_name, arg_value_set in arg_value_dict.items():
-                arg_type = knowledge.get_arg_type(arg_name)
-                f = {
-                    'range': _gen_rules_range,
-                    'fd': _gen_rules_fd,
-                    'bufsize': _gen_rules_bufsize,
-                    'bitwise': _gen_rules_bitwise,
-                }.get(arg_type, None)
-                if f != None:
-                    rule_list += f(syscall, arg_name, arg_value_set)
-                    no_arg_rule = False
-            if len(arg_value_dict) == 0 or no_arg_rule:
-                rule_list += gen_rules([syscall], record_dir, *unused, level=Level.NAME)
-        except Exception as e:
-            raise e
+        rule_list += gen_arg_rule_1(syscall, match_action, record_dir)
     return rule_list
+
+def gen_arg_rule_1(syscall,
+                   match_action,
+                   record_dir):
+    if (match_action == Action.ALLOW):
+        return gen_arg_rule_1_whilelist(syscall, match_action, record_dir)
+    else:
+        return gen_arg_rule_1_blacklist(syscall, match_action, record_dir)
+
+def gen_arg_rule_1_whilelist(syscall, match_action, record_dir):
+    syscall_dir = os.path.join(record_dir, syscall)
+    if not os.path.isdir(syscall_dir):
+        raise RuntimeError('\'{}\' is not a directory'.format(syscall_dir))
+    arg_value_dict = retrieve_arg_value(syscall, os.path.join(syscall_dir, 'args.uniq.list'))
+    arg_value_dict = dict(filter(_arg_is_valid, arg_value_dict.items()))
+    if (len(arg_value_dict) == 0):
+        return gen_name_rules([syscall], match_action)
+    arg_name_list = [arg_name for arg_name, _ in arg_value_dict.items()]
+
+    arg_related_set = knowledge.get_related_args(arg_name_list)
+    rule_list_list = []
+    if arg_related_set == None: # all args are independent
+        for arg_name in arg_name_list:
+            rule_list_list.append(gen_rule_from_one_arg(syscall, arg_name, arg_value_dict[arg_name]))
+    else:
+        rule_list_list.append(gen_rule_from_related_args(syscall, arg_related_set, arg_value_dict))
+        for arg_name in arg_name_list:
+            if arg_name not in arg_related_set:
+                rule_list_list.append(gen_rule_from_one_arg(syscall, arg_name, arg_value_dict[arg_name]))
+    return join_rules_list(rule_list_list)
+
+def gen_arg_rule_1_blacklist(syscall, match_action, record_dir):
+    pass
+
+def gen_rule_from_one_arg(syscall, arg_name, arg_value_set):
+    arg_type = knowledge.get_arg_type(arg_name)
+    f = {
+        'range': _gen_rules_range,
+        'fd': _gen_rules_fd,
+        'bufsize': _gen_rules_bufsize,
+        'bitwise': _gen_rules_bitwise,
+    }.get(arg_type, None)
+    if f != None:
+        return f(syscall, arg_name, arg_value_set)
+    return []
+
+def gen_rule_from_related_args(arg_name, arg_value_dict):
+    pass
+
+def join_rules_list(rule_list_list):
+    final_rule_list = []
+    combined_rules_list = itertools.product(*rule_list_list)
+    for rule_list in combined_rules_list:
+        final_rule_list.append(join_rules(rule_list))
+    return final_rule_list
+
+def join_rules(rule_list):
+    if len(rule_list) == 0:
+        raise RuntimeError('Rule list is empty')
+    elif len(rule_list) == 1:
+        return rule_list[0]
+    final_rule = copy.deepcopy(rule_list[0])
+    for rule in rule_list[1:]:
+        for cond in rule.conds:
+            final_rule.add_condition(cond)
+    return final_rule
+
+
+        # no_arg_rule = True
+        # for arg_name, arg_value_set in arg_value_dict.items():
+                # if f != None:
+                    # rule_list += f(syscall, arg_name, arg_value_set)
+                    # no_arg_rule = False
+            # if len(arg_value_dict) == 0 or no_arg_rule:
+                # rule_list += gen_rules([syscall], record_dir, *unused, level=Level.NAME)
+        # except Exception as e:
+            # raise e
+    # return rule_list
 
 def gen_clabel_rules(syscall_list, record_dir, clabel_file):
     rule_list = []
@@ -242,10 +312,10 @@ def _gen_rules_fd(syscall, arg_name, value_set):
     """
     arg_index = knowledge.get_index(arg_name)
     max_fd = 1 << max(value_set).bit_length()
-    return _gen_multiple_rules(syscall, Action.ALLOW, arg_index, Operator.LESS_THAN, {max_fd})
+    return _gen_multiple_rules(syscall, Action.ALLOW, arg_index, Operator.LESS_EQUAL, {max_fd})
 
 def _gen_rules_bufsize(syscall, arg_name, value_set):
-    """ generates rules for arguments with 'buf_size' type
+    """ generates rules for arguments with 'bufsize' type
 
     :syscall: syscall name
     :arg_name: argument name
@@ -254,11 +324,14 @@ def _gen_rules_bufsize(syscall, arg_name, value_set):
 
     """
     arg_index = knowledge.get_index(arg_name)
-    max_size = 1 << max(value_set).bit_length()
-    return _gen_multiple_rules(syscall, Action.ALLOW, arg_index, Operator.LESS_THAN, {max_size})
+    max_size = max(value_set)
+    if max_size != 0:
+        max_size -= 1
+    limit_size = 1 << max_size.bit_length()
+    return _gen_multiple_rules(syscall, Action.ALLOW, arg_index, Operator.LESS_EQUAL, {limit_size})
 
 def _gen_rules_bitwise(syscall, arg_name, value_set):
-    """ generates rules for arguments with 'buf_size' type
+    """ generates rules for arguments with 'bufsize' type
 
     :syscall: syscall name
     :arg_name: argument name
@@ -286,3 +359,8 @@ def _powers_of_2(num):
         i <<= 1
     return powers
 
+def _arg_is_valid(arg_dict_item):
+    valid_args = ['fd', 'bitwise', 'bufsize', 'range']
+    arg_name, _ = arg_dict_item
+    arg_type = knowledge.get_arg_type(arg_name)
+    return arg_type in valid_args

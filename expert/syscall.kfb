@@ -6,7 +6,7 @@ arg_index(read_buf, 1)
 arg_index(read_count, 2)
 arg_type(read_fd, fd)
 arg_type(read_buf, pointer)
-arg_type(read_count, buf_size)
+arg_type(read_count, bufsize)
 
 # 1
 # ssize_t write(int fd, const void *buf, size_t count);
@@ -16,7 +16,7 @@ arg_index(write_buf, 1)
 arg_index(write_count, 2)
 arg_type(write_fd, fd)
 arg_type(write_buf, pointer)
-arg_type(write_count, buf_size)
+arg_type(write_count, bufsize)
 
 # 2
 # int open(const char *pathname, int flags);
