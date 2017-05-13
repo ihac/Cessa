@@ -102,6 +102,6 @@ def adjust_seccomp(container, rule_list, record_dir):
             sys_name = syscall_name(systable, sys_id)
             print('adjust \'{}\' to lower limit level'.format(sys_name))
             rule_list = del_rules(rule_list, sys_name)
-            rule_list += gen_rules([sys_name], record_dir, None, level=Level.EASY)
+            rule_list += gen_rules([sys_name], record_dir, None, level=Level.NAME)
         # replace original seccomp profiles with new rules
         dump_rules(container.seccomp, rule_list)

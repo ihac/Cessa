@@ -66,6 +66,26 @@ class Rule(object):
                     raise ValueError('Unable to add multiple conditions based on the same argument owing to the limitation of libseccomp: adding condition {} to rule {}'.format(cond, self))
         self.conds.append(cond)
 
+class RuleCollection(object):
+
+    """ Represents the collection of all limit rules based on one syscall
+
+    """
+
+    def __init__(self, syscall, level):
+        self.name = syscall
+        self.level = level
+        self.rules = []
+
+    def add_rules(self, rule_list):
+        """ user should make sure that all rules in rule_list are generated in the same level with RuleCollection object
+
+        """
+        if len(rule_list) == 1 and len(rule_list[0].conds) == 0:
+            self.level = Level.NAME
+        for rule in rule_list:
+            if rule.name == self.name:
+                self.rules.append(rule)
 
 class Condition(object):
 
@@ -131,7 +151,7 @@ def gen_rules(syscall_list,
     :syscall_list: list of syscall names
     :record_dir: directory where program stores the preprocessed trace records.
     :level: limit level of rules
-    :returns: TODO
+    :returns: rule collection list
 
     """
     if record_dir == None:
@@ -149,16 +169,23 @@ def gen_rules(syscall_list,
     return gen_rules_f(syscall_list, match_action, record_dir, clabel_file)
 
 def gen_name_rules(syscall_list, match_action, *unused):
-    return [Rule(syscall, match_action) for syscall in syscall_list]
+    rule_coll_list = []
+    for syscall in syscall_list:
+        rule_coll = RuleCollection(syscall, Level.NAME)
+        rule_coll.add_rules([Rule(syscall, match_action)])
+        rule_coll_list.append(rule_coll)
+    return rule_coll_list
 
 def gen_arg_rules(syscall_list,
                   match_action,
                   record_dir,
                   *unused):
-    rule_list = []
+    rule_coll_list = []
     for syscall in syscall_list:
-        rule_list += gen_arg_rule_1(syscall, match_action, record_dir)
-    return rule_list
+        rule_coll = RuleCollection(syscall, Level.ARG)
+        rule_coll.add_rules(gen_arg_rule_1(syscall, match_action, record_dir))
+        rule_coll_list.append(rule_coll)
+    return rule_coll_list
 
 def gen_arg_rule_1(syscall,
                    match_action,
@@ -175,7 +202,7 @@ def gen_arg_rule_1_whilelist(syscall, match_action, record_dir):
     arg_value_dict = retrieve_arg_value(syscall, os.path.join(syscall_dir, 'args.uniq.list'))
     arg_value_dict = dict(filter(_arg_is_valid, arg_value_dict.items()))
     if (len(arg_value_dict) == 0):
-        return gen_name_rules([syscall], match_action)
+        return gen_name_rules([syscall], match_action)[0].rules
     arg_name_list = [arg_name for arg_name, _ in arg_value_dict.items()]
 
     arg_related_set = knowledge.get_related_args(arg_name_list)
