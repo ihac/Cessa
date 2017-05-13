@@ -18,6 +18,11 @@ get_macro_value
     when
         macro.define($macro, $value)
 
+related_args
+    use related_args($arg1, $arg2)
+    when
+        syscall.arg_related($arg1, $arg2)
+
 strict_mode_1
     use accurate_value_tuple($argument, $label, $value_tuple)
     when

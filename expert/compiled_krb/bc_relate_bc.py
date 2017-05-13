@@ -105,6 +105,31 @@ def get_macro_value(rule, arg_patterns, arg_context):
     finally:
       context.done()
 
+def related_args(rule, arg_patterns, arg_context):
+  engine = rule.rule_base.engine
+  patterns = rule.goal_arg_patterns()
+  if len(arg_patterns) == len(patterns):
+    context = contexts.bc_context(rule)
+    try:
+      if all(map(lambda pat, arg:
+                   pat.match_pattern(context, context,
+                                     arg, arg_context),
+                 patterns,
+                 arg_patterns)):
+        rule.rule_base.num_bc_rules_matched += 1
+        with engine.prove('syscall', 'arg_related', context,
+                          (rule.pattern(0),
+                           rule.pattern(1),)) \
+          as gen_1:
+          for x_1 in gen_1:
+            assert x_1 is None, \
+              "bc_relate.related_args: got unexpected plan from when clause 1"
+            rule.rule_base.num_bc_rule_successes += 1
+            yield
+        rule.rule_base.num_bc_rule_failures += 1
+    finally:
+      context.done()
+
 def strict_mode_1(rule, arg_patterns, arg_context):
   engine = rule.rule_base.engine
   patterns = rule.goal_arg_patterns()
@@ -327,6 +352,14 @@ def populate(engine):
                   (contexts.variable('macro'),
                    contexts.variable('value'),))
   
+  bc_rule.bc_rule('related_args', This_rule_base, 'related_args',
+                  related_args, None,
+                  (contexts.variable('arg1'),
+                   contexts.variable('arg2'),),
+                  (),
+                  (contexts.variable('arg1'),
+                   contexts.variable('arg2'),))
+  
   bc_rule.bc_rule('strict_mode_1', This_rule_base, 'accurate_value_tuple',
                   strict_mode_1, None,
                   (contexts.variable('argument'),
@@ -389,28 +422,30 @@ Krb_lineno_map = (
     ((89, 93), (17, 17)),
     ((95, 101), (19, 19)),
     ((114, 118), (22, 22)),
-    ((120, 120), (24, 24)),
-    ((121, 127), (25, 25)),
-    ((128, 134), (26, 26)),
-    ((136, 136), (28, 28)),
-    ((141, 141), (29, 29)),
-    ((145, 145), (30, 30)),
-    ((152, 152), (31, 31)),
-    ((168, 172), (34, 34)),
-    ((174, 180), (36, 36)),
-    ((181, 187), (37, 37)),
-    ((189, 189), (38, 38)),
-    ((194, 194), (39, 39)),
-    ((214, 218), (42, 42)),
-    ((220, 226), (44, 44)),
-    ((227, 227), (45, 45)),
-    ((228, 234), (46, 46)),
-    ((236, 236), (48, 48)),
-    ((240, 240), (49, 49)),
-    ((245, 245), (50, 50)),
-    ((261, 265), (53, 53)),
-    ((267, 273), (55, 55)),
-    ((274, 280), (56, 56)),
-    ((282, 282), (57, 57)),
-    ((286, 286), (58, 58)),
+    ((120, 126), (24, 24)),
+    ((139, 143), (27, 27)),
+    ((145, 145), (29, 29)),
+    ((146, 152), (30, 30)),
+    ((153, 159), (31, 31)),
+    ((161, 161), (33, 33)),
+    ((166, 166), (34, 34)),
+    ((170, 170), (35, 35)),
+    ((177, 177), (36, 36)),
+    ((193, 197), (39, 39)),
+    ((199, 205), (41, 41)),
+    ((206, 212), (42, 42)),
+    ((214, 214), (43, 43)),
+    ((219, 219), (44, 44)),
+    ((239, 243), (47, 47)),
+    ((245, 251), (49, 49)),
+    ((252, 252), (50, 50)),
+    ((253, 259), (51, 51)),
+    ((261, 261), (53, 53)),
+    ((265, 265), (54, 54)),
+    ((270, 270), (55, 55)),
+    ((286, 290), (58, 58)),
+    ((292, 298), (60, 60)),
+    ((299, 305), (61, 61)),
+    ((307, 307), (62, 62)),
+    ((311, 311), (63, 63)),
 )

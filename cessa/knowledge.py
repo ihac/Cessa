@@ -87,4 +87,13 @@ def get_related_args(arg_name_list):
     :returns: related set or None
 
     """
+    for arg_name in arg_name_list:
+        try:
+            with es_engine.prove_goal('bc_relate.related_args({}, $arg_name1)'.format(arg_name)) as gen:
+                for var, _ in gen:
+                    if var['arg_name1'] in arg_name_list:
+                        return [arg_name, var['arg_name1']]
+        except:
+            raise RuntimeError('Cannot prove goal in get_related_args() with arg_name = \'{}\''.format(arg_name))
     return None
+

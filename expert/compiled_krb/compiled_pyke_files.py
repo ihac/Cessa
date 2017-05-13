@@ -13,14 +13,14 @@ except NameError:
 
 def get_target_pkg():
     return target_pkg.target_pkg(__name__, __file__, pyke_version, loader, {
-         ('', '', 'syscall.kfb'):
-           [1494663560.775203, 'syscall.fbc'],
-         ('', '', 'macro.kfb'):
-           [1494663560.779487, 'macro.fbc'],
-         ('', '', 'argument.kfb'):
-           [1494663560.781009, 'argument.fbc'],
          ('', '', 'bc_relate.krb'):
-           [1494663560.803666, 'bc_relate_bc.py'],
+           [1494676849.647883, 'bc_relate_bc.py'],
+         ('', '', 'macro.kfb'):
+           [1494676849.656128, 'macro.fbc'],
+         ('', '', 'argument.kfb'):
+           [1494676849.657713, 'argument.fbc'],
+         ('', '', 'syscall.kfb'):
+           [1494676849.66101, 'syscall.fbc'],
         },
         compiler_version)
 

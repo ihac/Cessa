@@ -45,6 +45,7 @@ arg_index(socket_protocol, 2)
 arg_type(socket_domain, range)
 arg_type(socket_type, range)
 arg_type(socket_protocol, other)
+arg_related(socket_domain, socket_type)
 all_value(socket_domain, (AF_LOCAL, AF_INET, AF_INET6, AF_IPX, AF_NETLINK, AF_X25, AF_AX25, AF_ATMPVC, AF_APPLETALK, AF_PACKET, AF_ALG))
 all_value(socket_type, (SOCK_STREAM, SOCK_DGRAM, SOCK_SEQPACKET, SOCK_RAW, SOCK_RDM, SOCK_PACKET, SOCK_NONBLOCK, SOCK_CLOEXEC))
 

@@ -193,7 +193,8 @@ def gen_arg_rule_1_whilelist(syscall, match_action, record_dir):
 def gen_arg_rule_1_blacklist(syscall, match_action, record_dir):
     pass
 
-def gen_rule_from_one_arg(syscall, arg_name, arg_value_set):
+def gen_rule_from_one_arg(syscall, arg_name, arg_value_list):
+    arg_value_set = set(arg_value_list) # remove duplicate
     arg_type = knowledge.get_arg_type(arg_name)
     f = {
         'range': _gen_rules_range,
@@ -205,8 +206,26 @@ def gen_rule_from_one_arg(syscall, arg_name, arg_value_set):
         return f(syscall, arg_name, arg_value_set)
     return []
 
-def gen_rule_from_related_args(arg_name, arg_value_dict):
-    pass
+def gen_rule_from_related_args(syscall, arg_related_set, arg_value_dict):
+    rule_list = []
+    value_pair_list = []
+    arg1, arg2 = arg_related_set
+    arg1_value_list = arg_value_dict[arg1]
+    arg2_value_list = arg_value_dict[arg2]
+
+    for i in range(len(arg_value_dict[arg1])):
+        value_pair = (arg1_value_list[i], arg2_value_list[i])
+        if value_pair in value_pair_list:
+            continue
+        else:
+            value_pair_list.append(value_pair)
+            arg1_rules = gen_rule_from_one_arg(syscall, arg1, [arg1_value_list[i]])
+            arg2_rules = gen_rule_from_one_arg(syscall, arg2, [arg2_value_list[i]])
+            if len(arg1_rules) == len(arg2_rules) == 1:
+                rule_list.append(join_rules(arg1_rules+arg2_rules))
+            else:
+                raise RuntimeError('Cannot generate related rules for these two arguments {}'.format(arg_related_set))
+    return rule_list
 
 def join_rules_list(rule_list_list):
     final_rule_list = []
@@ -225,18 +244,6 @@ def join_rules(rule_list):
         for cond in rule.conds:
             final_rule.add_condition(cond)
     return final_rule
-
-
-        # no_arg_rule = True
-        # for arg_name, arg_value_set in arg_value_dict.items():
-                # if f != None:
-                    # rule_list += f(syscall, arg_name, arg_value_set)
-                    # no_arg_rule = False
-            # if len(arg_value_dict) == 0 or no_arg_rule:
-                # rule_list += gen_rules([syscall], record_dir, *unused, level=Level.NAME)
-        # except Exception as e:
-            # raise e
-    # return rule_list
 
 def gen_clabel_rules(syscall_list, record_dir, clabel_file):
     rule_list = []

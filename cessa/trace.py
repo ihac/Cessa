@@ -223,7 +223,7 @@ def retrieve_arg_value(syscall, arg_record_file):
 
     :syscall: the name of system call
     :arg_record_file: output file of data_preprocessing()
-    :returns: dictionary with key=combination of syscall name and arg name, value=set of arg value
+    :returns: dictionary with key=combination of syscall name and arg name, value=list of arg value
 
     """
     arg_value_dict = {}
@@ -238,9 +238,9 @@ def retrieve_arg_value(syscall, arg_record_file):
             _, arg_name = correct_syscall(syscall, arg_name, sysdig_conf)
             arg_name = syscall + '_' + arg_name
             if arg_value_dict.get(arg_name, None) == None:
-                arg_value_dict[arg_name] = {arg_value}
+                arg_value_dict[arg_name] = [arg_value]
             else:
-                arg_value_dict[arg_name].add(arg_value)
+                arg_value_dict[arg_name].append(arg_value)
     return arg_value_dict
 
 def load_sysdig_conf():
