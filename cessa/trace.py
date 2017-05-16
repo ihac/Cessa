@@ -181,7 +181,7 @@ def data_preprocessing(trace_file, out_dir):
     syscall_info = {}
     syscall_list = set()
     try:
-        sysdig_conf = load_sysdig_conf()
+        sysdig_conf = load_sysdig_conf(SYSDIG_CONF_FILE)
         for line in open(trace_file, 'r'):
             mark, name, *args = line.split()[5:]
             # '>' means syscall entry, '<' means syscall return
@@ -227,7 +227,7 @@ def retrieve_arg_value(syscall, arg_record_file):
 
     """
     arg_value_dict = {}
-    sysdig_conf = load_sysdig_conf()
+    sysdig_conf = load_sysdig_conf(SYSDIG_CONF_FILE)
     for line in open(arg_record_file, 'r'):
         _, *arg_list = line.split()
         for arg in arg_list:
@@ -243,13 +243,13 @@ def retrieve_arg_value(syscall, arg_record_file):
                 arg_value_dict[arg_name].append(arg_value)
     return arg_value_dict
 
-def load_sysdig_conf():
+def load_sysdig_conf(sysdig_file):
     """ loads sysdig config into json object
 
     :returns: JSON object
 
     """
-    return json.load(open(SYSDIG_CONF_FILE, 'r'))
+    return json.load(open(sysdig_file, 'r'))
 
 def correct_syscall(syscall, arg, conf):
     """ corrects syscall name and argument name

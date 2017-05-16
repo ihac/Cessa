@@ -7,15 +7,51 @@ es_engine = knowledge_engine.engine((None, 'expert.compiled_krb'))
 
 es_engine.activate('bc_relate')
 
-# def get_possible_value(syscall, arg_idx):
-    # """TODO: Docstring for get_possible_value.
+def get_clabel_list(syscall):
+    """ gets all supported clabels of a syscall
 
-    # :syscall: TODO
-    # :arg_idx: TODO
-    # :returns: TODO
+    :syscall: syscall name
+    :returns: clabel tuple
 
-    # """
-    # pass
+    """
+    try:
+        with es_engine.prove_goal('bc_relate.clabel_list({}, $clabel_tuple)'.format(syscall)) as gen:
+            for var, _ in gen:
+                return var['clabel_tuple']
+        return ()
+    except Exception:
+        raise RuntimeError('Cannot prove goal in get_clabel_list() with syscall = \'{}\''.format(syscall))
+
+def get_all_args(syscall):
+    """ gets all arguments' name of one syscall
+
+    :syscall: syscall name
+    :returns: argument list
+
+    """
+    try:
+        with es_engine.prove_goal('bc_relate.arg_list({}, $arg_tuple)'.format(syscall)) as gen:
+            for var, _ in gen:
+                return var['arg_tuple']
+        return ()
+    except Exception:
+        raise RuntimeError('Cannot prove goal in get_all_args() with syscall = \'{}\''.format(syscall))
+
+def get_accurate_value(arg_name, label):
+    """ gets all values of a argument with label specified(in accurate mode)
+
+    :arg_name: argument name
+    :label: clabel
+    :returns: value tuple
+
+    """
+    try:
+        with es_engine.prove_goal('bc_relate.accurate_value_tuple({}, {}, $values)'.format(arg_name, label)) as gen:
+            for var, _ in gen:
+                return var['values']
+        return ()
+    except Exception:
+        raise RuntimeError('Cannot prove goal in get_accurate_value() with arg_name = \'{}\', label = \'{}\''.format(arg_name, label))
 
 def get_value_range(arg_name):
     """ gets all possible value of argument if it has a value range.
@@ -28,7 +64,7 @@ def get_value_range(arg_name):
     try:
         macro_tuple = es_engine.prove_1_goal('bc_relate.all_value({}, $macro_tuple)'.format(arg_name))[0]['macro_tuple']
         return tuple(map(lambda x: get_value(x), macro_tuple))
-    except:
+    except Exception:
         raise RuntimeError('Cannot prove goal in get_arg_type() with arg_name = \'{}\''.format(arg_name))
 
 def get_arg_type(arg_name):
@@ -43,7 +79,7 @@ def get_arg_type(arg_name):
             for var, _ in gen:
                 return var['type']
             return 'other'
-    except:
+    except Exception:
         raise RuntimeError('Cannot prove goal in get_arg_type() with arg_name = \'{}\''.format(arg_name))
 
 def get_value(c_macro):
@@ -59,7 +95,7 @@ def get_value(c_macro):
             for var, _ in gen:
                 return var['value']
             return None
-    except:
+    except Exception:
         raise RuntimeError('Cannot prove goal in get_value() with c_macro = \'{}\''.format(c_macro))
 
 def get_index(arg_name):
@@ -77,7 +113,7 @@ def get_index(arg_name):
             for var, _ in gen:
                 return var['index']
             return None
-    except:
+    except Exception:
         raise RuntimeError('Cannot prove goal in get_index() with arg_name = \'{}\''.format(arg_name))
 
 def get_related_args(arg_name_list):
@@ -93,7 +129,7 @@ def get_related_args(arg_name_list):
                 for var, _ in gen:
                     if var['arg_name1'] in arg_name_list:
                         return [arg_name, var['arg_name1']]
-        except:
+        except Exception:
             raise RuntimeError('Cannot prove goal in get_related_args() with arg_name = \'{}\''.format(arg_name))
     return None
 

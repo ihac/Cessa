@@ -1,6 +1,7 @@
 # 0
 # ssize_t read(int fd, void *buf, size_t count);
-arg_list(read, read_fd, read_buf, read_count)
+clabel(read, ())
+arg_list(read, (read_fd, read_buf, read_count))
 arg_index(read_fd, 0)
 arg_index(read_buf, 1)
 arg_index(read_count, 2)
@@ -10,7 +11,8 @@ arg_type(read_count, bufsize)
 
 # 1
 # ssize_t write(int fd, const void *buf, size_t count);
-arg_list(write, write_fd, write_buf, write_count)
+clabel(write, ())
+arg_list(write, (write_fd, write_buf, write_count))
 arg_index(write_fd, 0)
 arg_index(write_buf, 1)
 arg_index(write_count, 2)
@@ -21,7 +23,8 @@ arg_type(write_count, bufsize)
 # 2
 # int open(const char *pathname, int flags);
 # int open(const char *pathname, int flags, mode_t mode);
-arg_list(open, open_pathname, open_flags, open_mode)
+clabel(open, ())
+arg_list(open, (open_pathname, open_flags, open_mode))
 arg_index(open_pathname, 0)
 arg_index(open_flags, 1)
 arg_index(open_mode, 2)
@@ -31,14 +34,16 @@ arg_type(open_mode, bitwise)
 
 # 21
 # int access(const char *pathname, int mode);
-arg_list(access, access_pathname, access_mode)
+clabel(access, ())
+arg_list(access, (access_pathname, access_mode))
 arg_index(access_pathname, 0)
 arg_index(access_mode, 1)
 arg_type(access_pathname, pointer)
 arg_type(access_mode, bitwise)
 
 # int socket(int domain, int type, int protocol);
-arg_list(socket, socket_domain, socket_type, socket_protocol)
+clabel(socket, (IPv4, IPv6))
+arg_list(socket, (socket_domain, socket_type, socket_protocol))
 arg_index(socket_domain, 0)
 arg_index(socket_type, 1)
 arg_index(socket_protocol, 2)
@@ -48,6 +53,7 @@ arg_type(socket_protocol, other)
 arg_related(socket_domain, socket_type)
 all_value(socket_domain, (AF_LOCAL, AF_INET, AF_INET6, AF_IPX, AF_NETLINK, AF_X25, AF_AX25, AF_ATMPVC, AF_APPLETALK, AF_PACKET, AF_ALG))
 all_value(socket_type, (SOCK_STREAM, SOCK_DGRAM, SOCK_SEQPACKET, SOCK_RAW, SOCK_RDM, SOCK_PACKET, SOCK_NONBLOCK, SOCK_CLOEXEC))
+
 
 # int access(const char *pathname, int mode);
 

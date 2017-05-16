@@ -5,6 +5,56 @@ from pyke import contexts, pattern, bc_rule
 pyke_version = '1.1.1'
 compiler_version = 1
 
+def get_clabel_list(rule, arg_patterns, arg_context):
+  engine = rule.rule_base.engine
+  patterns = rule.goal_arg_patterns()
+  if len(arg_patterns) == len(patterns):
+    context = contexts.bc_context(rule)
+    try:
+      if all(map(lambda pat, arg:
+                   pat.match_pattern(context, context,
+                                     arg, arg_context),
+                 patterns,
+                 arg_patterns)):
+        rule.rule_base.num_bc_rules_matched += 1
+        with engine.prove('syscall', 'clabel', context,
+                          (rule.pattern(0),
+                           rule.pattern(1),)) \
+          as gen_1:
+          for x_1 in gen_1:
+            assert x_1 is None, \
+              "bc_relate.get_clabel_list: got unexpected plan from when clause 1"
+            rule.rule_base.num_bc_rule_successes += 1
+            yield
+        rule.rule_base.num_bc_rule_failures += 1
+    finally:
+      context.done()
+
+def get_all_args(rule, arg_patterns, arg_context):
+  engine = rule.rule_base.engine
+  patterns = rule.goal_arg_patterns()
+  if len(arg_patterns) == len(patterns):
+    context = contexts.bc_context(rule)
+    try:
+      if all(map(lambda pat, arg:
+                   pat.match_pattern(context, context,
+                                     arg, arg_context),
+                 patterns,
+                 arg_patterns)):
+        rule.rule_base.num_bc_rules_matched += 1
+        with engine.prove('syscall', 'arg_list', context,
+                          (rule.pattern(0),
+                           rule.pattern(1),)) \
+          as gen_1:
+          for x_1 in gen_1:
+            assert x_1 is None, \
+              "bc_relate.get_all_args: got unexpected plan from when clause 1"
+            rule.rule_base.num_bc_rule_successes += 1
+            yield
+        rule.rule_base.num_bc_rule_failures += 1
+    finally:
+      context.done()
+
 def get_all_value(rule, arg_patterns, arg_context):
   engine = rule.rule_base.engine
   patterns = rule.goal_arg_patterns()
@@ -320,6 +370,22 @@ def loose_mode_2(rule, arg_patterns, arg_context):
 def populate(engine):
   This_rule_base = engine.get_create('bc_relate')
   
+  bc_rule.bc_rule('get_clabel_list', This_rule_base, 'clabel_list',
+                  get_clabel_list, None,
+                  (contexts.variable('syscall'),
+                   contexts.variable('clabel_tuple'),),
+                  (),
+                  (contexts.variable('syscall'),
+                   contexts.variable('clabel_tuple'),))
+  
+  bc_rule.bc_rule('get_all_args', This_rule_base, 'arg_list',
+                  get_all_args, None,
+                  (contexts.variable('syscall'),
+                   contexts.variable('argument_tuple'),),
+                  (),
+                  (contexts.variable('syscall'),
+                   contexts.variable('argument_tuple'),))
+  
   bc_rule.bc_rule('get_all_value', This_rule_base, 'all_value',
                   get_all_value, None,
                   (contexts.variable('argument'),
@@ -424,28 +490,32 @@ Krb_lineno_map = (
     ((114, 118), (22, 22)),
     ((120, 126), (24, 24)),
     ((139, 143), (27, 27)),
-    ((145, 145), (29, 29)),
-    ((146, 152), (30, 30)),
-    ((153, 159), (31, 31)),
-    ((161, 161), (33, 33)),
-    ((166, 166), (34, 34)),
-    ((170, 170), (35, 35)),
-    ((177, 177), (36, 36)),
-    ((193, 197), (39, 39)),
-    ((199, 205), (41, 41)),
-    ((206, 212), (42, 42)),
-    ((214, 214), (43, 43)),
-    ((219, 219), (44, 44)),
-    ((239, 243), (47, 47)),
-    ((245, 251), (49, 49)),
-    ((252, 252), (50, 50)),
-    ((253, 259), (51, 51)),
-    ((261, 261), (53, 53)),
-    ((265, 265), (54, 54)),
-    ((270, 270), (55, 55)),
-    ((286, 290), (58, 58)),
-    ((292, 298), (60, 60)),
-    ((299, 305), (61, 61)),
-    ((307, 307), (62, 62)),
+    ((145, 151), (29, 29)),
+    ((164, 168), (32, 32)),
+    ((170, 176), (34, 34)),
+    ((189, 193), (37, 37)),
+    ((195, 195), (39, 39)),
+    ((196, 202), (40, 40)),
+    ((203, 209), (41, 41)),
+    ((211, 211), (43, 43)),
+    ((216, 216), (44, 44)),
+    ((220, 220), (45, 45)),
+    ((227, 227), (46, 46)),
+    ((243, 247), (49, 49)),
+    ((249, 255), (51, 51)),
+    ((256, 262), (52, 52)),
+    ((264, 264), (53, 53)),
+    ((269, 269), (54, 54)),
+    ((289, 293), (57, 57)),
+    ((295, 301), (59, 59)),
+    ((302, 302), (60, 60)),
+    ((303, 309), (61, 61)),
     ((311, 311), (63, 63)),
+    ((315, 315), (64, 64)),
+    ((320, 320), (65, 65)),
+    ((336, 340), (68, 68)),
+    ((342, 348), (70, 70)),
+    ((349, 355), (71, 71)),
+    ((357, 357), (72, 72)),
+    ((361, 361), (73, 73)),
 )

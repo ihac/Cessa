@@ -14,6 +14,7 @@ This module implements limit rule class and corresponding interfaces.
 import os
 import itertools
 import copy
+import json
 
 from cessa import knowledge
 from cessa.trace import retrieve_arg_value
@@ -51,6 +52,24 @@ class Rule(object):
         for i in range(num):
             output += '{} and '.format(self.conds[i]) if i < num - 1 else '{}.'.format(self.conds[i])
         return output
+
+    def match(self, syscall, index=None, value=None):
+        """ determines whether a syscall is matched by this rule
+
+        :syscall: syscall name
+        :index: argument index
+        :value: argument value
+        :returns: True/False
+
+        """
+        if self.name != syscall:
+            return False
+        if len(self.conds) == 0 or index == None or value == None:
+            return True
+        for cond in self.conds:
+            if cond.match(index, value):
+                return True
+        return False
 
     def add_condition(self, cond):
         """ adds argument condition.
@@ -129,6 +148,26 @@ class Condition(object):
 
         return '{} argument {} {}'.format(index_str, op_str, value_str)
 
+    def match(self, index, value):
+        """ determines whether an argument is matched by this condition
+
+        :index: argument index
+        :value: argument value
+        :returns: True/False
+
+        """
+        if self.index != index:
+            return False
+        return {
+            Operator.NOT_EQUAL: value != self.value,
+            Operator.LESS_THAN: value < self.value,
+            Operator.LESS_EQUAL: value <= self.value,
+            Operator.EQUAL_TO: value == self.value,
+            Operator.GREATER_EQUAL: value >= self.value,
+            Operator.GREATER_THAN: value > self.value,
+            Operator.MASKED_EQUAL: (value & self.value2) == self.value if self.value2 != None else False
+        }.get(self.operator)
+
 def del_rules(rule_list, syscall):
     """ deletes all rules based on the specified syscall from rule list
 
@@ -187,15 +226,72 @@ def gen_arg_rules(syscall_list,
         rule_coll_list.append(rule_coll)
     return rule_coll_list
 
+def gen_clabel_rules(syscall_list,
+                     match_action,
+                     record_dir,
+                     clabel_file):
+    rule_coll_list = []
+    clabel_conf = load_clabel_conf(clabel_file)
+
+    for syscall in syscall_list:
+        clabel_list = knowledge.get_clabel_list(syscall)
+        if len(clabel_list) == 0:
+            rule_coll_list += gen_arg_rules([syscall], match_action, record_dir)
+            continue
+
+        arg_tuple = knowledge.get_all_args(syscall)
+        arg_clabel_value = dict([(arg, set()) for arg in arg_tuple])
+
+        rule_list = gen_arg_rule_1(syscall, match_action, record_dir)
+        for lab in clabel_list:
+            if lab not in clabel_conf['clabels']:
+                continue
+            for arg in arg_tuple:
+                arg_values_with_lab = knowledge.get_accurate_value(arg, lab)
+                for macro in arg_values_with_lab:
+                    value = knowledge.get_value(macro)
+                    arg_clabel_value[arg].add(value)
+
+        not_matched_values = copy.deepcopy(arg_clabel_value)
+        for r in rule_list:
+            for arg, value_set in arg_clabel_value.items():
+                arg_index = knowledge.get_index(arg)
+                for value in value_set:
+                    if r.match(syscall, arg_index, value):
+                        print(not_matched_values, arg, value)
+                        not_matched_values[arg].remove(value)
+
+        for arg, value_set in not_matched_values.items():
+            if len(value_set) == 0:
+                continue
+            rule_list += gen_rule_from_one_arg(syscall, arg, value_set, match_action)
+            rule_coll = RuleCollection(syscall, Level.CLABEL)
+            rule_coll.add_rules(rule_list)
+            rule_coll_list.append(rule_coll)
+
+    return rule_coll_list
+    # for rule k
+
+def gen_custom_rules(syscall_list, record_dir, *unused):
+    """ generates limit rules by asking user a set of questions
+
+    :syscall_list: TODO
+    :record_dir: TODO
+    :*unused: TODO
+    :returns: TODO
+
+    """
+    pass
+
 def gen_arg_rule_1(syscall,
                    match_action,
                    record_dir):
     if (match_action == Action.ALLOW):
-        return gen_arg_rule_1_whilelist(syscall, match_action, record_dir)
+        return gen_arg_rule_1_whitelist(syscall, match_action, record_dir)
     else:
         return gen_arg_rule_1_blacklist(syscall, match_action, record_dir)
 
-def gen_arg_rule_1_whilelist(syscall, match_action, record_dir):
+def gen_arg_rule_1_whitelist(syscall, match_action, record_dir):
     syscall_dir = os.path.join(record_dir, syscall)
     if not os.path.isdir(syscall_dir):
         raise RuntimeError('\'{}\' is not a directory'.format(syscall_dir))
@@ -209,18 +305,18 @@ def gen_arg_rule_1_whilelist(syscall, match_action, record_dir):
     rule_list_list = []
     if arg_related_set == None: # all args are independent
         for arg_name in arg_name_list:
-            rule_list_list.append(gen_rule_from_one_arg(syscall, arg_name, arg_value_dict[arg_name]))
+            rule_list_list.append(gen_rule_from_one_arg(syscall, arg_name, arg_value_dict[arg_name], match_action))
     else:
-        rule_list_list.append(gen_rule_from_related_args(syscall, arg_related_set, arg_value_dict))
+        rule_list_list.append(gen_rule_from_related_args(syscall, arg_related_set, arg_value_dict, match_action))
         for arg_name in arg_name_list:
             if arg_name not in arg_related_set:
-                rule_list_list.append(gen_rule_from_one_arg(syscall, arg_name, arg_value_dict[arg_name]))
+                rule_list_list.append(gen_rule_from_one_arg(syscall, arg_name, arg_value_dict[arg_name], match_action))
     return join_rules_list(rule_list_list)
 
 def gen_arg_rule_1_blacklist(syscall, match_action, record_dir):
     pass
 
-def gen_rule_from_one_arg(syscall, arg_name, arg_value_list):
+def gen_rule_from_one_arg(syscall, arg_name, arg_value_list, match_action):
     arg_value_set = set(arg_value_list) # remove duplicate
     arg_type = knowledge.get_arg_type(arg_name)
     f = {
@@ -230,10 +326,10 @@ def gen_rule_from_one_arg(syscall, arg_name, arg_value_list):
         'bitwise': _gen_rules_bitwise,
     }.get(arg_type, None)
     if f != None:
-        return f(syscall, arg_name, arg_value_set)
+        return f(syscall, arg_name, arg_value_set, match_action)
     return []
 
-def gen_rule_from_related_args(syscall, arg_related_set, arg_value_dict):
+def gen_rule_from_related_args(syscall, arg_related_set, arg_value_dict, match_action):
     rule_list = []
     value_pair_list = []
     arg1, arg2 = arg_related_set
@@ -246,8 +342,8 @@ def gen_rule_from_related_args(syscall, arg_related_set, arg_value_dict):
             continue
         else:
             value_pair_list.append(value_pair)
-            arg1_rules = gen_rule_from_one_arg(syscall, arg1, [arg1_value_list[i]])
-            arg2_rules = gen_rule_from_one_arg(syscall, arg2, [arg2_value_list[i]])
+            arg1_rules = gen_rule_from_one_arg(syscall, arg1, [arg1_value_list[i]], match_action)
+            arg2_rules = gen_rule_from_one_arg(syscall, arg2, [arg2_value_list[i]], match_action)
             if len(arg1_rules) == len(arg2_rules) == 1:
                 rule_list.append(join_rules(arg1_rules+arg2_rules))
             else:
@@ -272,21 +368,6 @@ def join_rules(rule_list):
             final_rule.add_condition(cond)
     return final_rule
 
-def gen_clabel_rules(syscall_list, record_dir, clabel_file):
-    rule_list = []
-    return rule_list
-    # for rule k
-
-def gen_custom_rules(syscall_list, record_dir, *unused):
-    """ generates limit rules by asking user a set of questions
-
-    :syscall_list: TODO
-    :record_dir: TODO
-    :*unused: TODO
-    :returns: TODO
-
-    """
-    pass
 
 def _gen_multiple_rules(syscall, action, arg_index, op, value_list):
     """ generates multiple rules(for the same argument and the same operator) automatically
@@ -306,7 +387,7 @@ def _gen_multiple_rules(syscall, action, arg_index, op, value_list):
         rule_list.append(rule)
     return rule_list
 
-def _gen_rules_range(syscall, arg_name, value_set):
+def _gen_rules_range(syscall, arg_name, value_set, match_action):
     """ generates rules for arguments with 'range' type
 
     :syscall: syscall name
@@ -317,7 +398,7 @@ def _gen_rules_range(syscall, arg_name, value_set):
     """
     rule_list = []
     arg_index = knowledge.get_index(arg_name)
-    gen_f = partial(_gen_multiple_rules, syscall, Action.ALLOW, arg_index)
+    gen_f = partial(_gen_multiple_rules, syscall, match_action, arg_index)
     if len(value_set) <= 3:
         rule_list += gen_f(Operator.EQUAL_TO, value_set)
     else:
@@ -335,7 +416,7 @@ def _gen_rules_range(syscall, arg_name, value_set):
                 rule_list += gen_f(Operator.LESS_EQUAL, {max_v})
     return rule_list
 
-def _gen_rules_fd(syscall, arg_name, value_set):
+def _gen_rules_fd(syscall, arg_name, value_set, match_action):
     """ generates rules for arguments with 'fd' type
 
     :syscall: syscall name
@@ -346,9 +427,9 @@ def _gen_rules_fd(syscall, arg_name, value_set):
     """
     arg_index = knowledge.get_index(arg_name)
     max_fd = 1 << max(value_set).bit_length()
-    return _gen_multiple_rules(syscall, Action.ALLOW, arg_index, Operator.LESS_EQUAL, {max_fd})
+    return _gen_multiple_rules(syscall, match_action, arg_index, Operator.LESS_EQUAL, {max_fd})
 
-def _gen_rules_bufsize(syscall, arg_name, value_set):
+def _gen_rules_bufsize(syscall, arg_name, value_set, match_action):
     """ generates rules for arguments with 'bufsize' type
 
     :syscall: syscall name
@@ -362,9 +443,9 @@ def _gen_rules_bufsize(syscall, arg_name, value_set):
     if max_size != 0:
         max_size -= 1
     limit_size = 1 << max_size.bit_length()
-    return _gen_multiple_rules(syscall, Action.ALLOW, arg_index, Operator.LESS_EQUAL, {limit_size})
+    return _gen_multiple_rules(syscall, match_action, arg_index, Operator.LESS_EQUAL, {limit_size})
 
-def _gen_rules_bitwise(syscall, arg_name, value_set):
+def _gen_rules_bitwise(syscall, arg_name, value_set, match_action):
     """ generates rules for arguments with 'bufsize' type
 
     :syscall: syscall name
@@ -380,7 +461,7 @@ def _gen_rules_bitwise(syscall, arg_name, value_set):
         for x in all_powers:
             powers |= x
     powers ^= int('0xFFFFFFFF', base=16)
-    rule = Rule(syscall, Action.ALLOW)
+    rule = Rule(syscall, match_action)
     rule.add_condition(Condition(arg_index, Operator.MASKED_EQUAL, 0, powers))
     return [rule]
 
@@ -398,3 +479,11 @@ def _arg_is_valid(arg_dict_item):
     arg_name, _ = arg_dict_item
     arg_type = knowledge.get_arg_type(arg_name)
     return arg_type in valid_args
+
+def load_clabel_conf(clabel_file):
+    """ loads clabel config into json object
+
+    :returns: JSON object
+
+    """
+    return json.load(open(clabel_file, 'r'))

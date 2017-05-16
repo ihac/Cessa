@@ -1,3 +1,13 @@
+get_clabel_list
+    use clabel_list($syscall, $clabel_tuple)
+    when
+        syscall.clabel($syscall, $clabel_tuple)
+
+get_all_args
+    use arg_list($syscall, $argument_tuple)
+    when
+        syscall.arg_list($syscall, $argument_tuple)
+
 get_all_value
     use all_value($argument, $value_tuple)
     when
