@@ -235,39 +235,49 @@ def gen_clabel_rules(syscall_list,
 
     for syscall in syscall_list:
         clabel_list = knowledge.get_clabel_list(syscall)
-        if len(clabel_list) == 0:
-            rule_coll_list += gen_arg_rules([syscall], match_action, record_dir)
+        rule_coll_list += gen_clabel_rule_1(syscall, match_action, record_dir, clabel_list, clabel_conf)
+
+    return rule_coll_list
+
+def gen_clabel_rule_1(syscall,
+                      match_action,
+                      record_dir,
+                      clabel_list,
+                      clabel_conf
+                      ):
+    if len(clabel_list) == 0:
+        return gen_arg_rules([syscall], match_action, record_dir)
+
+    arg_tuple = knowledge.get_all_args(syscall)
+    arg_clabel_value = dict([(arg, set()) for arg in arg_tuple])
+
+    rule_list = gen_arg_rule_1(syscall, match_action, record_dir)
+    for lab in clabel_list:
+        if lab not in clabel_conf['clabels']:
             continue
+        for arg in arg_tuple:
+            arg_values_with_lab = knowledge.get_accurate_value(arg, lab)
+            for macro in arg_values_with_lab:
+                value = knowledge.get_value(macro)
+                arg_clabel_value[arg].add(value)
 
-        arg_tuple = knowledge.get_all_args(syscall)
-        arg_clabel_value = dict([(arg, set()) for arg in arg_tuple])
+    not_matched_values = copy.deepcopy(arg_clabel_value)
+    for r in rule_list:
+        for arg, value_set in arg_clabel_value.items():
+            arg_index = knowledge.get_index(arg)
+            for value in value_set:
+                if r.match(syscall, arg_index, value):
+                    print(not_matched_values, arg, value)
+                    not_matched_values[arg].remove(value)
 
-        rule_list = gen_arg_rule_1(syscall, match_action, record_dir)
-        for lab in clabel_list:
-            if lab not in clabel_conf['clabels']:
-                continue
-            for arg in arg_tuple:
-                arg_values_with_lab = knowledge.get_accurate_value(arg, lab)
-                for macro in arg_values_with_lab:
-                    value = knowledge.get_value(macro)
-                    arg_clabel_value[arg].add(value)
-
-        not_matched_values = copy.deepcopy(arg_clabel_value)
-        for r in rule_list:
-            for arg, value_set in arg_clabel_value.items():
-                arg_index = knowledge.get_index(arg)
-                for value in value_set:
-                    if r.match(syscall, arg_index, value):
-                        print(not_matched_values, arg, value)
-                        not_matched_values[arg].remove(value)
-
-        for arg, value_set in not_matched_values.items():
-            if len(value_set) == 0:
-                continue
-            rule_list += gen_rule_from_one_arg(syscall, arg, value_set, match_action)
-            rule_coll = RuleCollection(syscall, Level.CLABEL)
-            rule_coll.add_rules(rule_list)
-            rule_coll_list.append(rule_coll)
+    rule_coll_list = []
+    for arg, value_set in not_matched_values.items():
+        if len(value_set) == 0:
+            continue
+        rule_list += gen_rule_from_one_arg(syscall, arg, value_set, match_action)
+        rule_coll = RuleCollection(syscall, Level.CLABEL)
+        rule_coll.add_rules(rule_list)
+        rule_coll_list.append(rule_coll)
 
     return rule_coll_list
     # for rule k
