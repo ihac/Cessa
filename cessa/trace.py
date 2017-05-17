@@ -90,7 +90,7 @@ class Container(object):
                              stdout = subprocess.PIPE,
                              stderr = subprocess.PIPE,
                              universal_newlines = True)
-        sleep(0.1)
+        # sleep(0.1)
         if None != p.poll() > 0:
             _, err = p.communicate()
             raise RuntimeError('Unable to run container {} with command \'{}\''.format(self.name, cmd), err)
@@ -111,10 +111,6 @@ class Container(object):
                              stderr = subprocess.PIPE,
                              universal_newlines = True)
         return p.wait()
-        #returncode = p.wait()
-        #_, err = p.communicate()
-        #if returncode != 0:
-        #    raise RuntimeError('Failed to run workload script \'{}\''.format(self.workload), err)
 
     def remove(self, force=True):
         """ removes container
@@ -161,7 +157,11 @@ def trace_syscall(container, trace_file):
     try:
         sysdigp = start_sysdig(container.name, open(trace_file, 'w'))
         container.run()
+        # wait for starting container
+        sleep(5)
         container.exec_workload()
+        # wait for sysdig recording workload syscall
+        sleep(3)
         sysdigp.kill()
         container.remove()
     except Exception as e:
