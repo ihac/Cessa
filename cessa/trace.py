@@ -85,6 +85,38 @@ class Container(object):
             raise ValueError('Cannot set empty rule list for container')
         self.rules = rule_coll_list
 
+    def del_rules(self, syscall):
+        """ deletes all limit rules based on the syscall
+
+        :syscall: syscall name
+        :returns: None
+
+        """
+        self.rules = list(filter(lambda rule_coll: rule_coll.name != syscall, self.rules))
+
+    def get_rules(self, syscall):
+        """ gets all limit rules based on the syscall
+
+        :syscall: syscall name
+        :returns: rule collection
+
+        """
+        for rule_coll in self.rules:
+            if rule_coll.name == syscall:
+                return rule_coll
+
+    def add_rules(self, rule_coll):
+        """ adds a rule collection
+
+        :rule_coll: rule collection based on one syscall
+        :returns: None
+
+        """
+        for r_c in self.rules:
+            if r_c.name == rule_coll.name:
+                raise ValueError('Rule collection on syscall \'{}\' already exists. You should remove it before add a new one.'.format(r_c.name))
+        self.rules.append(rule_coll)
+
     def run(self, with_seccomp=False):
         """ runs container
 

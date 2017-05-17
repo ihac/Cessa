@@ -34,8 +34,8 @@ class Seccomp(object):
     def set_arch(self, archs):
         self.architectures += archs
 
-    def set_rules(self, rules_coll):
-        """ loads rules into seccomp profile
+    def add_rules(self, rules_coll):
+        """ adds rules into seccomp profile
 
         :rule: limit rule
         :returns: None
@@ -73,7 +73,7 @@ class Seccomp(object):
         """
         return json.dumps(self.to_json(), indent=4, sort_keys=True)
 
-def dump_rules(seccomp_file, rule_list, default_action=Action.ERRNO, arch=Arch.X86_64):
+def dump_rules(seccomp_file, rule_coll_list, default_action=Action.ERRNO, arch=Arch.X86_64):
     """ dumps rules into disk
 
     :seccomp_file: seccomp profile pathname
@@ -83,7 +83,7 @@ def dump_rules(seccomp_file, rule_list, default_action=Action.ERRNO, arch=Arch.X
     """
     seccomp = Seccomp(default_action)
     seccomp.set_arch([arch])
-    seccomp.set_rules(rule_list)
+    seccomp.add_rules(rule_coll_list)
 
     try:
         with open(seccomp_file, 'w') as f:

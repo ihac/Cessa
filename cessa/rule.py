@@ -168,16 +168,6 @@ class Condition(object):
             Operator.MASKED_EQUAL: (value & self.value2) == self.value if self.value2 != None else False
         }.get(self.operator)
 
-def del_rules(rule_list, syscall):
-    """ deletes all rules based on the specified syscall from rule list
-
-    :rule_list: rule list
-    :syscall: syscall name
-    :returns: new rule list
-
-    """
-    return list(filter(lambda rule: rule.name != syscall, rule_list))
-
 
 def gen_rules(syscall_list,
               match_action=Action.ALLOW,

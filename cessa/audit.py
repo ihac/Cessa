@@ -13,7 +13,7 @@ This module implements interfaces for testing seccomp profile and auditing conta
 
 import re
 import time
-from cessa.rule import del_rules, gen_rules
+from cessa.rule import gen_rules
 from cessa.profile import dump_rules
 from cessa.config import Level
 LOG_FILE = '/var/log/audit/audit.log'
@@ -67,7 +67,7 @@ def syscall_name(systable, syscall_id):
     """
     return systable.get(syscall_id, '')
 
-def adjust_seccomp(container, rule_list, record_dir):
+def adjust_seccomp(container):
     """ adjusts seccomp filter rules by testing container
 
     :container: Container object
@@ -101,7 +101,7 @@ def adjust_seccomp(container, rule_list, record_dir):
         for sys_id in error_syscall_set:
             sys_name = syscall_name(systable, sys_id)
             print('adjust \'{}\' to lower limit level'.format(sys_name))
-            rule_list = del_rules(rule_list, sys_name)
-            rule_list += gen_rules([sys_name], record_dir, None, level=Level.NAME)
+            container.del_rules(sys_name)
+            container.add_rules(gen_rules([sys_name], level=Level.NAME))
         # replace original seccomp profiles with new rules
-        dump_rules(container.seccomp, rule_list)
+        dump_rules(container.seccomp, container.rules)
