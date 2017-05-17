@@ -3,7 +3,7 @@
 
 import json
 from cessa import trace, rule, profile, audit
-from cessa.config import Action , Arch, Operator
+from cessa.config import Action , Arch, Operator, Level
 workload = '/root/cessa/scripts/nginx-test.workload'
 trace_file = '/root/cessa/tmp/nginx.trace.list.2'
 record_dir = '/root/cessa/tmp'
@@ -11,10 +11,10 @@ seccomp_profile = '/root/cessa/nginx-test.profile'
 
 def auto_test():
     syscall_list = trace.data_preprocessing('tmp/nginx.trace.list', 'tmp')
-    rules2 = rule.gen_rules(syscall_list, 'tmp', None, level='normal')
+    rule_coll_list = rule.gen_rules(syscall_list, record_dir='tmp', level=Level.ARG)
     seccomp = profile.Seccomp(Action.ERRNO)
     seccomp.set_arch([Arch.X86_64])
-    seccomp.set_rules(rules2)
+    seccomp.set_rules(rule_coll_list)
     json_profile = seccomp.to_json()
     return json.dumps(json_profile, indent=4, sort_keys=True)
 

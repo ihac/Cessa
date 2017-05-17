@@ -34,15 +34,16 @@ class Seccomp(object):
     def set_arch(self, archs):
         self.architectures += archs
 
-    def set_rules(self, rules):
+    def set_rules(self, rules_coll):
         """ loads rules into seccomp profile
 
         :rule: limit rule
         :returns: None
 
         """
-        for rule in rules:
-            self._load_rule(rule)
+        for rule_coll in rules_coll:
+            for r in rule_coll.rules:
+                self._load_rule(r)
 
     def to_json(self):
         """ converts seccomp object to a json object

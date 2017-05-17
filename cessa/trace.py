@@ -19,6 +19,7 @@ import re
 from os import makedirs
 from time import sleep
 from cessa import docker
+# from cessa.rule import RuleCollection
 
 import json
 SYSDIG_CONF_FILE = 'expert/sysdig.json'
@@ -39,6 +40,7 @@ class Container(object):
         self.image_id = image_id
 
         self.opts = []
+        self.rules = None
         self.workload = None
         self.seccomp = None
 
@@ -71,6 +73,17 @@ class Container(object):
         if not os.path.isfile(profile):
             raise ValueError('Seccomp profile \'{}\' not exists'.format(profile))
         self.seccomp = profile
+
+    def set_rules(self, rule_coll_list):
+        """ sets seccomp limit rules for container
+
+        :rule_coll_list: list of rule collection
+        :returns: None
+
+        """
+        if len(rule_coll_list):
+            raise ValueError('Cannot set empty rule list for container')
+        self.rules = rule_coll_list
 
     def run(self, with_seccomp=False):
         """ runs container
