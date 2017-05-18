@@ -1,0 +1,4 @@
+get_question_by_clabel
+    use question_by_clabel($clabel, $question)
+    when
+        question_fact.clabel_question($clabel, $question)

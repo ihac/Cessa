@@ -1,0 +1,6 @@
+clabel_question(INIT, main_kind)
+clabel_question(WEB, web_label)
+clabel_question(OS, os_label)
+clabel_question(LANG, lang_label)
+clabel_question(DB, db_label)
+clabel_question(TOOL, tool_label)

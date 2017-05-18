@@ -10,12 +10,12 @@ main_kind($container_name, $ans)
         - You might select all that apply.
     ---
     $ans = select_n
-        web: Web (e.g., Nginx, Ghost, Wordpress)
-        os: Operating System (e.g., Ubuntu, Debian, CentOS)
-        lang: Language (e.g., Python, Perl, Ruby)
-        db: Database (e.g., MySQL, MongoDB, Redis)
-        tool: Tool (e.g., Jenkins, Elasticsearch)
-        other: Other (e.g., hello-world)
+        WEB: Web (e.g., Nginx, Ghost, Wordpress)
+        OS: Operating System (e.g., Ubuntu, Debian, CentOS)
+        LANG: Language (e.g., Python, Perl, Ruby)
+        DB: Database (e.g., MySQL, MongoDB, Redis)
+        TOOL: Tool (e.g., Jenkins, Elasticsearch)
+        OTHER: Other (e.g., hello-world)
         none: None of the above
 
 web_label($container_name, $ans)
@@ -23,6 +23,6 @@ web_label($container_name, $ans)
         - You might select all that apply.
     ---
     $ans = select_n
-        ipv4: IPv4 (using IPv4 sockets)
-        ipv6: IPv6 (using IPv6 sockets)
-        local: Local (using UNIX domain sockets)
+        IPv4: IPv4 (using IPv4 sockets)
+        IPv6: IPv6 (using IPv6 sockets)
+        LOCAL: Local (using UNIX domain sockets)

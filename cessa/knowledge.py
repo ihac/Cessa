@@ -2,6 +2,8 @@
 # encoding: utf-8
 
 from pyke import knowledge_engine
+from cessa.config import PROJECT_NAME
+from pyke.knowledge_engine import CanNotProve
 es_engine = knowledge_engine.engine((None, 'expert.compiled_krb'))
 # es_engine = knowledge_engine.engine((None, 'cessa/compiled_knowledge'))
 
@@ -117,7 +119,7 @@ def get_index(arg_name):
         raise RuntimeError('Cannot prove goal in get_index() with arg_name = \'{}\''.format(arg_name))
 
 def get_related_args(arg_name_list):
-    """ get related set from the argument list if exists
+    """ gets related set from the argument list if exists
 
     :arg_name_list: argument name list
     :returns: related set or None
@@ -133,3 +135,37 @@ def get_related_args(arg_name_list):
             raise RuntimeError('Cannot prove goal in get_related_args() with arg_name = \'{}\''.format(arg_name))
     return None
 
+def get_custom_clabels(container_name):
+    """ gets custom clabels for container by asking user a series of questions according to the question base
+
+    :container_name: container name
+    :returns: clabel list
+
+    """
+    es_engine.activate('question_rule')
+    ans = es_engine.prove_1_goal('questions.hint({}, {}, $ans)'.format(PROJECT_NAME, container_name))
+    if not ans[0]['ans']:
+        return []
+
+    init_quest = es_engine.prove_1_goal('question_rule.question_by_clabel(INIT, $question)')[0]['question']
+    return _get_custom_clabels_by_question(container_name, init_quest)
+
+def _get_custom_clabels_by_question(container_name, question):
+    try:
+        ans = es_engine.prove_1_goal('questions.{}({}, $ans)'.format(question, container_name))[0]['ans']
+    except CanNotProve:
+        return []
+
+    if 'none' in ans:
+        return []
+    clabel_list = list(ans)
+    for clabel in ans:
+        try:
+            with es_engine.prove_goal('question_rule.question_by_clabel({}, $question)'.format(clabel)) as gen:
+                for var, _ in gen:
+                    new_quest = var['question']
+                    clabel_list += _get_custom_clabels_by_question(container_name, new_quest)
+        except Exception as e:
+            raise e
+
+    return clabel_list
