@@ -1,0 +1,28 @@
+hint($project, $container, $ans)
+    Now you're using the knowledge base of $project.
+    To set up Clabels for container $container, I'm gonna ask you a series of questions. Note that your answer cannot be changed after you submit it, so please do pay attention to the questions and write your answer carefully.
+    If you're ready, enter 'y'; if not, enter 'n'
+    ---
+    $ans = yn
+
+main_kind($container_name, $ans)
+    Which of these app kinds are suitable for container $container_name?
+        - You might select all that apply.
+    ---
+    $ans = select_n
+        web: Web (e.g., Nginx, Ghost, Wordpress)
+        os: Operating System (e.g., Ubuntu, Debian, CentOS)
+        lang: Language (e.g., Python, Perl, Ruby)
+        db: Database (e.g., MySQL, MongoDB, Redis)
+        tool: Tool (e.g., Jenkins, Elasticsearch)
+        other: Other (e.g., hello-world)
+        none: None of the above
+
+web_label($container_name, $ans)
+    Which of these WEB labels are suitable for container $container_name?
+        - You might select all that apply.
+    ---
+    $ans = select_n
+        ipv4: IPv4 (using IPv4 sockets)
+        ipv6: IPv6 (using IPv6 sockets)
+        local: Local (using UNIX domain sockets)
