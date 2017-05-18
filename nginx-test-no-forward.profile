@@ -32,6 +32,11 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
+            "name": "eventfd"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
             "name": "accept"
         },
         {
@@ -105,6 +110,11 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
+            "name": "io_setup"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
             "name": "sendfile"
         },
         {
@@ -146,6 +156,11 @@
             "action": "SCMP_ACT_ALLOW",
             "args": [],
             "name": "epoll_wait"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "futex"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -253,6 +268,11 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
+            "name": "getdents"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
             "name": "bind"
         },
         {
@@ -263,12 +283,22 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
+            "name": "getpid"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
             "name": "chown"
         },
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
             "name": "dup"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "sysinfo"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -318,22 +348,12 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "futex"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
             "name": "lstat"
         },
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
             "name": "capget"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "getpid"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -384,6 +404,21 @@
             "action": "SCMP_ACT_ALLOW",
             "args": [],
             "name": "dup2"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "gettid"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "accept4"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "eventfd2"
         }
     ]
 }

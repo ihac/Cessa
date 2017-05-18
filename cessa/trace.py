@@ -81,7 +81,7 @@ class Container(object):
         :returns: None
 
         """
-        if len(rule_coll_list):
+        if len(rule_coll_list) == 0:
             raise ValueError('Cannot set empty rule list for container')
         self.rules = rule_coll_list
 
@@ -222,7 +222,10 @@ def data_preprocessing(trace_file, out_dir):
 
     """
     if not os.path.isdir(out_dir):
-        raise ValueError('\'{}\' is not a directory'.format(out_dir))
+        try:
+            makedirs(out_dir)
+        except:
+            raise ValueError('Unable to create directory \'{}\''.format(out_dir))
     syscall_info = {}
     syscall_list = set()
     try:
