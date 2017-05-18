@@ -16,13 +16,12 @@ import os.path
 import logging
 import shutil
 import re
+import json
 from os import makedirs
 from time import sleep
 from cessa import docker
-# from cessa.rule import RuleCollection
+from cessa.config import SYSDIG_CONF_FILE
 
-import json
-SYSDIG_CONF_FILE = 'expert/sysdig.json'
 
 class Container(object):
 

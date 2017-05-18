@@ -16,9 +16,7 @@ import time
 from time import sleep
 from cessa.rule import gen_rules
 from cessa.profile import dump_rules
-from cessa.config import Level
-LOG_FILE = '/var/log/audit/audit.log'
-SYSTABLE_FILE = 'expert/systable.list'
+from cessa.config import Level, SYSTABLE_FILE, LOG_FILE
 
 def _get_seccomp_events(start_time):
     """ gets seccomp events from auditd log file

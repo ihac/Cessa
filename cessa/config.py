@@ -12,6 +12,10 @@ This module defines all configuration constants for seccomp profile.
 
 from enum import Enum, unique
 
+SYSTABLE_FILE = 'configs/systable.list'
+SYSDIG_CONF_FILE = 'configs/sysdig.json'
+LOG_FILE = '/var/log/audit/audit.log'
+
 @unique
 class Action(Enum):
 
