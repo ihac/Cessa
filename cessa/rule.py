@@ -334,7 +334,26 @@ def gen_arg_rule_1_whitelist(syscall, match_action, record_dir):
     return join_rules_list(rule_list_list)
 
 def gen_arg_rule_1_blacklist(syscall, match_action, record_dir):
-    pass
+    """ generates blacklist limit rules for the syscall
+    Note that here record_dir is not a directory any more, but a dict of argument value
+
+    :syscall: syscall name
+    :match_action: seccomp action to be taken when rule is matched
+    :record_dir: a dict of argument value
+    :returns: rule list
+
+    """
+    arg_value_dict = record_dir # Be careful! This only work in blacklist mode!
+    arg_value_dict = dict(filter(_arg_is_valid, arg_value_dict.items()))
+    if (len(arg_value_dict) == 0):
+        return gen_name_rules([syscall], match_action)[0].rules
+    arg_name_list = [arg_name for arg_name, _ in arg_value_dict.items()]
+
+    rule_list = []
+    for arg_name in arg_name_list:
+        rule_list += gen_rule_from_one_arg(syscall, arg_name, arg_value_dict[arg_name], match_action)
+    return rule_list
+
 
 def gen_rule_from_one_arg(syscall, arg_name, arg_value_list, match_action):
     arg_value_set = set(arg_value_list) # remove duplicate
@@ -419,6 +438,11 @@ def _gen_rules_range(syscall, arg_name, value_set, match_action):
     rule_list = []
     arg_index = knowledge.get_index(arg_name)
     gen_f = partial(_gen_multiple_rules, syscall, match_action, arg_index)
+
+    # blacklist
+    if match_action != Action.ALLOW:
+        return gen_f(Operator.EQUAL_TO, value_set)
+
     if len(value_set) <= 3:
         rule_list += gen_f(Operator.EQUAL_TO, value_set)
     else:
@@ -446,7 +470,13 @@ def _gen_rules_fd(syscall, arg_name, value_set, match_action):
 
     """
     arg_index = knowledge.get_index(arg_name)
+
     max_fd = 1 << max(value_set).bit_length()
+
+    # blacklist mode
+    if match_action != Action.ALLOW:
+        return _gen_multiple_rules(syscall, match_action, arg_index, Operator.GREATER_THAN, {max_fd})
+
     return _gen_multiple_rules(syscall, match_action, arg_index, Operator.LESS_EQUAL, {max_fd})
 
 def _gen_rules_bufsize(syscall, arg_name, value_set, match_action):
@@ -463,6 +493,11 @@ def _gen_rules_bufsize(syscall, arg_name, value_set, match_action):
     if max_size != 0:
         max_size -= 1
     limit_size = 1 << max_size.bit_length()
+
+    # blacklist mode
+    if match_action != Action.ALLOW:
+        return _gen_multiple_rules(syscall, match_action, arg_index, Operator.GREATER_THAN, {limit_size})
+
     return _gen_multiple_rules(syscall, match_action, arg_index, Operator.LESS_EQUAL, {limit_size})
 
 def _gen_rules_bitwise(syscall, arg_name, value_set, match_action):
@@ -482,6 +517,7 @@ def _gen_rules_bitwise(syscall, arg_name, value_set, match_action):
             powers |= x
     powers ^= int('0xFFFFFFFF', base=16)
     rule = Rule(syscall, match_action)
+    # TODO blacklist mode
     rule.add_condition(Condition(arg_index, Operator.MASKED_EQUAL, 0, powers))
     return [rule]
 
