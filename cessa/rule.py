@@ -510,6 +510,16 @@ def _gen_rules_bitwise(syscall, arg_name, value_set, match_action):
 
     """
     arg_index = knowledge.get_index(arg_name)
+
+    # blacklist mode
+    if match_action != Action.ALLOW:
+        rule_list = []
+        for value in value_set:
+            rule = Rule(syscall, match_action)
+            rule.add_condition(Condition(arg_index, Operator.MASKED_EQUAL, value, value))
+            rule_list.append(rule)
+        return rule_list
+
     powers = 0;
     for value in value_set:
         all_powers = _powers_of_2(value)
@@ -517,7 +527,6 @@ def _gen_rules_bitwise(syscall, arg_name, value_set, match_action):
             powers |= x
     powers ^= int('0xFFFFFFFF', base=16)
     rule = Rule(syscall, match_action)
-    # TODO blacklist mode
     rule.add_condition(Condition(arg_index, Operator.MASKED_EQUAL, 0, powers))
     return [rule]
 
