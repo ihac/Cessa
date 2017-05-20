@@ -31,13 +31,20 @@ def trace_test(container_name, image_id, opts=[]):
 
 def gen_rules_test(container, syscall_list, level=Level.NAME):
     record_dir = 'tmp/{}'.format(container.name)
-    rule_coll_list = rule.gen_rules(syscall_list, record_dir=record_dir, level=level)
+    clabel_file = 'configs/{}.clabel.json'.format(container.name)
+    rule_coll_list = rule.gen_rules(syscall_list, record_dir=record_dir, clabel_file=clabel_file, level=level)
     container.set_rules(rule_coll_list)
 
 def dump_rules_test(container):
-    seccomp_profile = '{}.profile'.format(container.name)
+    seccomp_profile = 'profiles/{}.profile'.format(container.name)
     profile.dump_rules(seccomp_profile, container.rules)
     container.set_seccomp(seccomp_profile)
 
 def adjust_test(container):
     audit.adjust_seccomp(container)
+
+def all_test(container_name, image_id, opts=[], level=Level.NAME):
+    container, syscall_list = trace_test(container_name, image_id, opts=opts)
+    gen_rules_test(container, syscall_list, level=level)
+    dump_rules_test(container)
+    adjust_test(container)

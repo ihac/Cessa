@@ -7,17 +7,32 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "brk"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
             "name": "rt_sigaction"
         },
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "unlinkat"
+            "name": "procexit"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "select"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "arch_prctl"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "sigreturn"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "accept"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -27,12 +42,7 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "setgroups"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "lseek"
+            "name": "close"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -42,12 +52,57 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "getsockname"
+            "name": "writev"
         },
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "accept"
+            "name": "times"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "brk"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "geteuid"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "newfstatat"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "mmap"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "pipe"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "set_robust_list"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "fstat"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "lseek"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "uname"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -124,12 +179,7 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "exit_group"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "gettimeofday"
+            "name": "getppid"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -139,7 +189,22 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "epoll_create1"
+            "name": "open"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "set_tid_address"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "epoll_wait"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "gettimeofday"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -156,97 +221,7 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "setgid"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "epoll_ctl"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "mprotect"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "stat"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "set_tid_address"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "times"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "exit"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "open"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "getppid"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "sendto"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "connect"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "clone"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "pipe"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "epoll_wait"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "futex"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "geteuid"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "fcntl"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "getcwd"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "newfstatat"
+            "name": "getsockname"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -256,27 +231,12 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "uname"
+            "name": "exit"
         },
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "madvise"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "arch_prctl"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "select"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "close"
+            "name": "fcntl"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -291,60 +251,12 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "fstat"
+            "name": "dup"
         },
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "rt_sigprocmask"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [
-                {
-                    "index": 0,
-                    "op": "SCMP_CMP_LE",
-                    "value": 16,
-                    "valueTwo": 0
-                },
-                {
-                    "index": 2,
-                    "op": "SCMP_CMP_LE",
-                    "value": 8192,
-                    "valueTwo": 0
-                }
-            ],
-            "name": "read"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "set_robust_list"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "writev"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "mmap"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "procexit"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "bind"
-        },
-        {
-            "action": "SCMP_ACT_ALLOW",
-            "args": [],
-            "name": "recvmsg"
+            "name": "stat"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -354,22 +266,70 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
+            "name": "madvise"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "recvmsg"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "bind"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "mprotect"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "exit_group"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
             "name": "signaldeliver"
         },
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "getpid"
+            "name": "epoll_create1"
         },
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "sigreturn"
+            "name": "connect"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [
+                {
+                    "index": 2,
+                    "op": "SCMP_CMP_LE",
+                    "value": 8192,
+                    "valueTwo": 0
+                },
+                {
+                    "index": 0,
+                    "op": "SCMP_CMP_LE",
+                    "value": 16,
+                    "valueTwo": 0
+                }
+            ],
+            "name": "read"
         },
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
-            "name": "dup"
+            "name": "unlinkat"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "rt_sigprocmask"
         },
         {
             "action": "SCMP_ACT_ALLOW",
@@ -379,7 +339,47 @@
         {
             "action": "SCMP_ACT_ALLOW",
             "args": [],
+            "name": "setgroups"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "setgid"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "getpid"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "epoll_ctl"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
             "name": "setsockopt"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "sendto"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "futex"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "clone"
+        },
+        {
+            "action": "SCMP_ACT_ALLOW",
+            "args": [],
+            "name": "getcwd"
         },
         {
             "action": "SCMP_ACT_ALLOW",
