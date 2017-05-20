@@ -1,3 +1,10 @@
+#########
+# supported arg_type: fd, range, bitwise, bufsize, pointer, offset, timeout, other
+#
+#
+#########
+
+## SYSCALLS
 # 0
 # ssize_t read(int fd, void *buf, size_t count);
 clabel(read, ())
@@ -31,6 +38,170 @@ arg_index(open_mode, 2)
 arg_type(open_pathname, pointer)
 arg_type(open_flags, bitwise)
 arg_type(open_mode, bitwise)
+
+# 3
+# int close(int fd);
+clabel(close, ())
+arg_list(close, (close_fd))
+arg_index(close_fd, 0)
+arg_type(close_fd, fd)
+
+# 4
+# int stat(const char *pathname, struct stat *statbuf);
+# get file status
+clabel(stat, ())
+arg_list(stat, (stat_pathname, stat_statbuf))
+arg_index(stat_pathname, 0)
+arg_index(stat_statbuf, 1)
+arg_type(stat_pathname, pointer)
+arg_type(stat_statbuf, pointer)
+
+# 5
+# int fstat(int fd, struct stat *statbuf);
+# get file status
+clabel(fstat, ())
+arg_list(fstat, (fstat_fd, fstat_statbuf))
+arg_index(fstat_fd, 0)
+arg_index(fstat_statbuf, 1)
+arg_type(fstat_fd, fd)
+arg_type(fstat_statbuf, pointer)
+
+# 6
+# int lstat(const char *pathname, struct stat *statbuf);
+# get file status(for symbolic link, returns info about the link itself)
+clabel(lstat, ())
+arg_list(lstat, (lstat_pathname, lstat_statbuf))
+arg_index(lstat_pathname, 0)
+arg_index(lstat_statbuf, 1)
+arg_type(lstat_pathname, pointer)
+arg_type(lstat_statbuf, pointer)
+
+# 7
+# int poll(struct pollfd *fds, nfds_t nfds, int timeout);
+# wait for some event on a file descriptor
+clabel(poll, ())
+arg_list(poll, (poll_fds, poll_nfds, poll_timeout))
+arg_index(poll_fds, 0)
+arg_index(poll_nfds, 1)
+arg_index(poll_timeout, 2)
+arg_type(poll_fds, pointer)
+arg_type(poll_nfds, other)
+arg_type(poll_timeout, timeout)
+
+# 8
+# off_t lseek(int fd, off_t offset, int whence);
+# reposition read/write file offset
+clabel(lseek, ())
+arg_list(lseek, (lseek_fd, lseek_offset, lseek_whence))
+arg_index(lseek_fd, 0)
+arg_index(lseek_offset, 1)
+arg_index(lseek_whence, 2)
+arg_index(lseek_fd, fd)
+arg_index(lseek_offset, offset)
+arg_index(lseek_whence, range)
+# SEEK_SET: The file offset is set to offset bytes.
+# SEEK_CUR: The file offset is set to its current location plus offset bytes.
+# SEEK_END: The file offset is set to the size of the file plus offset bytes.
+# SEEK_DATA: Adjust the file offset to the next location in the file
+#            greater than or equal to offset containing data.  If offset
+#            points to data, then the file offset is set to offset
+# SEEK_HOLE: Adjust the file offset to the next hole in the file greater
+#            than or equal to offset.  If offset points into the middle of
+#            a hole, then the file offset is set to offset.  If there is no
+#            hole past offset, then the file offset is adjusted to the end
+#            of the file (i.e., there is an implicit hole at the end of any
+#            file).
+all_value(lseek_whence, (SEEK_SET, SEEK_CUR, SEEK_END, SEEK_DATA, SEEK_HOLE))
+
+# 9
+# void *mmap(void *addr, size_t length, int prot, int flags,
+#            int fd, off_t offset);
+# map or unmap files or devices into memory
+clabel(mmap, ())
+arg_list(mmap, (mmap_addr, mmap_length, mmap_prot, mmap_flags, mmap_fd, mmap_offset))
+arg_index(mmap_addr, 0)
+arg_index(mmap_length, 1)
+arg_index(mmap_prot, 2)
+arg_index(mmap_flags, 3)
+arg_index(mmap_fd, 4)
+arg_index(mmap_offset, 5)
+arg_type(mmap_addr, pointer)
+arg_type(mmap_length, bufsize)
+arg_type(mmap_prot, bitwise)
+arg_type(mmap_flags, bitwise)
+arg_type(mmap_fd, fd)
+arg_type(mmap_offset, offset)
+# PROT_EXEC:  Pages may be executed.
+# PROT_READ:  Pages may be read.
+# PROT_WRITE: Pages may be written.
+# PROT_NONE:  Pages may not be accessed.
+all_value(mmap_prot, (PROT_EXEC, PROT_READ, PROT_WRITE, PROT_NONE))
+all_value(mmap_flags, (MAP_SHARED, MAP_PRIVATE, MAP_32BIT, MAP_ANONYMOUS, MAP_DENYWRITE, MAP_EXECUTABLE, MAP_FILE, MAP_FIXED, MAP_GROWSDOWN, MAP_HUGETLB, MAP_HUGE_2MB, MAP_HUGE_1GB, MAP_LOCKED, MAP_NONBLOCK, MAP_NORESERVE, MAP_POPULATE, MAP_STACK, MAP_UNINITIALIZED))
+
+# 10
+# int mprotect(void *addr, size_t len, int prot);
+# set protection on a region of memory
+clabel(mprotect, ())
+arg_list(mprotect, (mprotect_addr, mprotect_len, mprotect_prot))
+arg_index(mprotect_addr, 0)
+arg_index(mprotect_len, 1)
+arg_index(mprotect_prot, 2)
+arg_type(mprotect_addr, pointer)
+arg_type(mprotect_len, other)
+arg_type(mprotect_prot, bitwise)
+all_value(mprotect_prot, (PROT_EXEC, PROT_READ, PROT_WRITE, PROT_NONE, PROT_SEM, PROT_SAO, PROT_GROWSUP, PROT_GROWSDOWN))
+
+# 11
+# int munmap(void *addr, size_t length);
+# map or unmap files or devices into memory
+clabel(munmap, ())
+arg_list(munmap, (munmap_addr, munmap_length))
+arg_index(munmap_addr, 0)
+arg_index(munmap_length, 1)
+arg_type(munmap_addr, pointer)
+arg_type(munmap_length, bufsize)
+
+# 12
+# int brk(void *addr);
+# change data segment size
+clabel(brk, ())
+arg_list(brk, (brk_addr))
+arg_index(brk_addr, 0)
+arg_type(brk_addr, pointer)
+
+# 13
+# int sigaction(int signum, const struct sigaction *act,
+#               struct sigaction *oldact);
+# examine and change a signal action
+clabel(rt_sigaction, ())
+arg_list(rt_sigaction, (rt_sigaction_signum, rt_sigaction_act, rt_sigaction_oldact))
+arg_index(rt_sigaction_signum, 0)
+arg_index(rt_sigaction_act, 1)
+arg_index(rt_sigaction_oldact, 2)
+arg_type(rt_sigaction_signum, other)
+arg_type(rt_sigaction_act, pointer)
+arg_type(rt_sigaction_oldact, pointer)
+
+# 14
+# int rt_sigprocmask(int how, const kernel_sigset_t *set,
+#                    kernel_sigset_t *oldset, size_t sigsetsize);
+# examine and change blocked signals
+clabel(rt_sigprocmask, ())
+arg_list(rt_sigprocmask, (rt_sigprocmask_how, rt_sigprocmask_set, rt_sigprocmask_oldset, rt_sigprocmask_sigsetsize))
+arg_index(rt_sigprocmask_how, 0)
+arg_index(rt_sigprocmask_set, 1)
+arg_index(rt_sigprocmask_oldset, 2)
+arg_index(rt_sigprocmask_sigsetsize, 3)
+arg_type(rt_sigprocmask_how, range)
+arg_type(rt_sigprocmask_set, pointer)
+arg_type(rt_sigprocmask_oldset, pointer)
+arg_type(rt_sigprocmask_sigsetsize, other)
+# SIG_BLOCK: The set of blocked signals is the union of the current set and the set argument.
+# SIG_UNBLOCK: The signals in set are removed from the current set of blocked
+#              signals. It is permissible to attempt to unblock a signal
+#              which is not blocked.
+# SIG_SETMASK: The set of blocked signals is set to the argument set.
+all_value(rt_sigprocmask_how, (SIG_BLOCK, SIG_UNBLOCK, SIG_SETMASK))
 
 # 21
 # int access(const char *pathname, int mode);
