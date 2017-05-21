@@ -50,6 +50,13 @@
                 "size": "count"
             }
         },
+        "recvfrom": {
+            "name": "recvfrom",
+            "arguments": {
+                "fd": "sockfd",
+                "size": "len"
+            }
+        },
         "socket": {
             "name": "socket",
             "arguments": {
