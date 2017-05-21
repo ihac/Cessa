@@ -40,6 +40,15 @@ define(SIG_BLOCK, 0)
 define(SIG_UNBLOCK, 1)
 define(SIG_SETMASK, 2)
 
+## recvfrom flags
+define(MSG_DONTWAIT, 64)
+define(MSG_ERRQUEUE, 8192)
+define(MSG_CMSG_CLOEXEC, 1073741824)
+define(MSG_OOB, 1)
+define(MSG_PEEK, 2)
+define(MSG_TRUNC, 32)
+define(MSG_WAITALL, 256)
+
 # Supported address families.
 define(AF_UNIX, 1)
 define(AF_LOCAL, 1)
