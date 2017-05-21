@@ -203,14 +203,199 @@ arg_type(rt_sigprocmask_sigsetsize, other)
 # SIG_SETMASK: The set of blocked signals is set to the argument set.
 all_value(rt_sigprocmask_how, (SIG_BLOCK, SIG_UNBLOCK, SIG_SETMASK))
 
-# 21
+## 15
+# int sigreturn(...);
+# return from signal handler and cleanup stack frame
+clabel(rt_sigreturn, ())
+arg_list(rt_sigreturn, ())
+
+## 16
+# int ioctl(int fd, unsigned long request, ...);
+# control devie
+clabel(ioctl, ())
+arg_list(ioctl, (ioctl_fd, ioctl_request))
+arg_index(ioctl_fd, 0)
+arg_index(ioctl_request, 1)
+arg_type(ioctl_fd, fd)
+arg_type(ioctl_request, other)
+
+## 17
+# ssize_t pread(int fd, void *buf, size_t count, off_t offset);
+# read from a file descriptor at a given offset
+clabel(pread64, ())
+arg_list(pread64, (pread64_fd, pread64_buf, pread64_count, pread64_offset))
+arg_index(pread64_fd, 0)
+arg_index(pread64_buf, 1)
+arg_index(pread64_count, 2)
+arg_index(pread64_offset, 3)
+arg_type(pread64_fd, fd)
+arg_type(pread64_buf, pointer)
+arg_type(pread64_count, bufsize)
+arg_type(pread64_offset, offset)
+
+## 18
+# ssize_t pwrite(int fd, void *buf, size_t count, off_t offset);
+# write to a file descriptor at a given offset
+clabel(pwrite64, ())
+arg_list(pwrite64, (pwrite64_fd, pwrite64_buf, pwrite64_count, pwrite64_offset))
+arg_index(pwrite64_fd, 0)
+arg_index(pwrite64_buf, 1)
+arg_index(pwrite64_count, 2)
+arg_index(pwrite64_offset, 3)
+arg_type(pwrite64_fd, fd)
+arg_type(pwrite64_buf, pointer)
+arg_type(pwrite64_count, bufsize)
+arg_type(pwrite64_offset, offset)
+
+## 19
+# ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
+# read data into multiple buffers
+clabel(readv, ())
+arg_list(readv, (readv_fd, readv_iov, readv_iovcnt))
+arg_index(readv_fd, 0)
+arg_index(readv_iov, 1)
+arg_index(readv_iovcnt, 2)
+arg_type(readv_fd, fd)
+arg_type(readv_iov, pointer)
+arg_type(readv_iovcnt, other)
+
+## 20
+# ssize_t writev(int fd, const struct iovec *iov, int iovcnt);
+# write data into multiple buffers
+clabel(writev, ())
+arg_list(writev, (writev_fd, writev_iov, writev_iovcnt))
+arg_index(writev_fd, 0)
+arg_index(writev_iov, 1)
+arg_index(writev_iovcnt, 2)
+arg_type(writev_fd, fd)
+arg_type(writev_iov, pointer)
+arg_type(writev_iovcnt, other)
+
+## 21
 # int access(const char *pathname, int mode);
+# check user's permissions for a file
 clabel(access, ())
 arg_list(access, (access_pathname, access_mode))
 arg_index(access_pathname, 0)
 arg_index(access_mode, 1)
 arg_type(access_pathname, pointer)
 arg_type(access_mode, bitwise)
+
+## 22
+# int pipe(int pipefd[2]);
+# create pipe
+clabel(pipe, ())
+arg_list(pipe, (pipe_pipefd))
+arg_index(pipe_pipefd, 0)
+arg_index(pipe_pipefd, pointer)
+
+## 23
+# int select(int nfds, fd_set *readfds, fd_set *writefds,
+#            fd_set *exceptfds, struct timeval *timeout);
+# synchronous I/O multiplexing
+clabel(select, ())
+# arg_list(select, nfds)
+
+## 32
+# int dup(int oldfd);
+# duplicate a file descriptor
+clabel(dup, ())
+arg_list(dup, (dup_oldfd))
+arg_index(dup_oldfd, 0)
+arg_type(dup_oldfd, fd)
+
+## 33
+# int dup2(int oldfd, int newfd);
+# duplicate a file descriptor
+clabel(dup2, ())
+arg_list(dup2, (dup_oldfd, dup_newfd))
+arg_index(dup_oldfd, 0)
+arg_index(dup_newfd, 1)
+arg_type(dup_oldfd, fd)
+arg_type(dup_newfd, fd)
+
+## 35
+# int nanosleep(const struct timespec *req, struct timespec *rem);
+# high-resolution sleep
+clabel(nanosleep, ())
+arg_list(nanosleep, (nanosleep_req, nanosleep_rem))
+arg_index(nanosleep_req, 0)
+arg_index(nanosleep_rem, 1)
+arg_type(nanosleep_req, pointer)
+arg_type(nanosleep_rem, pointer)
+
+## 40
+# ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count);
+# transfer data between file descriptors
+clabel(sendfile, ())
+arg_list(sendfile, (sendfile_out_fd, sendfile_in_fd, sendfile_offset, sendfile_count))
+arg_index(sendfile_out_fd, 0)
+arg_index(sendfile_in_fd, 1)
+arg_index(sendfile_offset, 2)
+arg_index(sendfile_count, 3)
+arg_index(sendfile_out_fd, fd)
+arg_index(sendfile_in_fd, fd)
+arg_index(sendfile_offset, pointer)
+arg_index(sendfile_count, bufsize)
+
+## 41
+# int socket(int domain, int type, int protocol);
+# create an endpoint for communication
+clabel(socket, (IPv4, IPv6))
+arg_list(socket, (socket_domain, socket_type, socket_protocol))
+arg_index(socket_domain, 0)
+arg_index(socket_type, 1)
+arg_index(socket_protocol, 2)
+arg_type(socket_domain, range)
+arg_type(socket_type, bitwise)
+arg_type(socket_protocol, other)
+arg_related(socket_domain, socket_type)
+all_value(socket_domain, (AF_LOCAL, AF_INET, AF_INET6, AF_IPX, AF_NETLINK, AF_X25, AF_AX25, AF_ATMPVC, AF_APPLETALK, AF_PACKET, AF_ALG))
+all_value(socket_type, (SOCK_STREAM, SOCK_DGRAM, SOCK_SEQPACKET, SOCK_RAW, SOCK_RDM, SOCK_PACKET, SOCK_NONBLOCK, SOCK_CLOEXEC))
+
+## 42
+# int connect(int sockfd, const struct sockaddr *addr,
+#             socklen_t addrlen);
+# initiate a connection on a socket
+clabel(connect, ())
+arg_list(connect, (connect_sockfd, connect_addr, connect_addrlen))
+arg_index(connect_sockfd, 0)
+arg_index(connect_addr, 1)
+arg_index(connect_addrlen, 2)
+arg_type(connect_sockfd, fd)
+arg_type(connect_addr, pointer)
+arg_type(connect_addrlen, bufsize)
+
+## 43
+# int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+# accept a connection on a socket
+clabel(accept, ())
+arg_list(accept, (accept_sockfd, accept_addr, accept_addrlen))
+arg_index(accept_sockfd, 0)
+arg_index(accept_addr, 1)
+arg_index(accept_addrlen, 2)
+arg_type(accept_sockfd, fd)
+arg_type(accept_addr, pointer)
+arg_type(accept_addrlen, pointer)
+
+## 44
+# ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+#                const struct sockaddr *dest_addr, socklen_t addrlen);
+# send a message to a socket
+clabel(sendto, ())
+arg_list(sendto, (sendto_sockfd, sendto_buf, sendto_len, sendto_flags, sendto_dest_addr, sendto_addrlen))
+arg_index(sendto_sockfd, 0)
+arg_index(sendto_buf, 1)
+arg_index(sendto_len, 2)
+arg_index(sendto_flags, 3)
+arg_index(sendto_dest_addr, 4)
+arg_index(sendto_addrlen, 5)
+arg_index(sendto_sockfd, fd)
+arg_index(sendto_buf, pointer)
+arg_index(sendto_len, bufsize)
+arg_index(sendto_flags, bitwise)
+arg_index(sendto_dest_addr, pointer)
+arg_index(sendto_addrlen, bufsize)
 
 ## 45
 # ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
@@ -233,18 +418,40 @@ arg_type(recvfrom_addrlen, pointer)
 all_value(recvfrom_flags, (MSG_DONTWAIT, MSG_ERRQUEUE, MSG_CMSG_CLOEXEC, MSG_OOB, MSG_PEEK, MSG_TRUNC, MSG_WAITALL))
 
 
-# int socket(int domain, int type, int protocol);
-clabel(socket, (IPv4, IPv6))
-arg_list(socket, (socket_domain, socket_type, socket_protocol))
-arg_index(socket_domain, 0)
-arg_index(socket_type, 1)
-arg_index(socket_protocol, 2)
-arg_type(socket_domain, range)
-arg_type(socket_type, range)
-arg_type(socket_protocol, other)
-arg_related(socket_domain, socket_type)
-all_value(socket_domain, (AF_LOCAL, AF_INET, AF_INET6, AF_IPX, AF_NETLINK, AF_X25, AF_AX25, AF_ATMPVC, AF_APPLETALK, AF_PACKET, AF_ALG))
-all_value(socket_type, (SOCK_STREAM, SOCK_DGRAM, SOCK_SEQPACKET, SOCK_RAW, SOCK_RDM, SOCK_PACKET, SOCK_NONBLOCK, SOCK_CLOEXEC))
+## 46
+# ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags);
+# send a message to a socket
+clabel(sendmsg, ())
+arg_list(sendmsg, (sendmsg_sockfd, sendmsg_msg, sendmsg_flags))
+arg_index(sendmsg_sockfd, 0)
+arg_index(sendmsg_msg, 1)
+arg_index(sendmsg_flags, 2)
+arg_index(sendmsg_sockfd, fd)
+arg_index(sendmsg_msg, pointer)
+arg_index(sendmsg_flags, bitwise)
+
+## 47
+# ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags);
+# receive a message from a socket
+clabel(recvmsg, ())
+arg_list(recvmsg, (recvmsg_sockfd, recvmsg_msg, recvmsg_flags))
+arg_index(recvmsg_sockfd, 0)
+arg_index(recvmsg_msg, 1)
+arg_index(recvmsg_flags, 2)
+arg_index(recvmsg_sockfd, fd)
+arg_index(recvmsg_msg, pointer)
+arg_index(recvmsg_flags, bitwise)
+
+## 48
+# int shutdown(int sockfd, int how);
+# shut down part of a full-duplex connection
+clabel(shutdown, ())
+arg_list(shutdown, (shutdown_sockfd, shutdown_how))
+arg_index(shutdown_sockfd, 0)
+arg_index(shutdown_how, 1)
+arg_type(shutdown_sockfd, fd)
+arg_type(shutdown_how, range)
+all_value(shutdown_how, (SHUT_RD, SHUT_WR, SHUT_RDWR))
 
 
 # int access(const char *pathname, int mode);
