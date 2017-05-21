@@ -476,6 +476,7 @@ def _gen_rules_fd(syscall, arg_name, value_set, match_action):
     """
     arg_index = knowledge.get_index(arg_name)
 
+    value_set = set(filter(lambda fd: fd <= 0x7FFFFFFF, value_set))
     max_fd = 1 << max(value_set).bit_length()
 
     # blacklist mode
