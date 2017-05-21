@@ -233,7 +233,7 @@ def data_preprocessing(trace_file, out_dir):
             mark, name, *args = line.split()[5:]
             # '>' means syscall entry, '<' means syscall return
             if mark == '>':
-                name, _ = correct_syscall(name, None, sysdig_conf)
+                name, args = correct_syscall(name, args, sysdig_conf)
                 syscall_list.add(name)
                 if syscall_info.get(name, None) == None:
                     syscall_info[name] = [args]
@@ -282,7 +282,7 @@ def retrieve_arg_value(syscall, arg_record_file):
             if p == None:
                 continue
             arg_name, arg_value = p.group(1), int(p.group(2))
-            _, arg_name = correct_syscall(syscall, arg_name, sysdig_conf)
+            # _, arg_name = correct_syscall(syscall, arg_name, sysdig_conf)
             arg_name = syscall + '_' + arg_name
             if arg_value_dict.get(arg_name, None) == None:
                 arg_value_dict[arg_name] = [arg_value]
@@ -298,20 +298,34 @@ def load_sysdig_conf(sysdig_file):
     """
     return json.load(open(sysdig_file, 'r'))
 
-def correct_syscall(syscall, arg, conf):
+def correct_syscall(syscall, args, conf):
     """ corrects syscall name and argument name
     This method makes sense because sysdig produces syscall/argument names which are conflicting with linux man page.
 
     :syscall: syscall name
-    :arg: argument name
-    :returns: correct syscall and correct arg
+    :args: argument list
+    :returns: correct syscall and correct args
 
     """
     if conf['correct'].get(syscall, None) == None:
-        return syscall, arg
+        return syscall, args
     syscall_conf = conf['correct'][syscall]
-    syscall = syscall_conf['name']
 
-    if arg == None or syscall_conf['arguments'].get(arg, None) == None:
-        return syscall, arg
-    return syscall, syscall_conf['arguments'][arg]
+    includes_conf = None
+    syscall = syscall_conf['name']
+    if syscall_conf.get('includes', None) != None:
+        includes_conf = syscall_conf['includes']
+
+    newargs = []
+    for arg in args:
+        p = re.match("(\w+)=(\d+).*", arg)
+        if p == None:
+            continue
+        arg_name = p.group(1)
+        if includes_conf != None and includes_conf.get(arg_name, None) != None:
+            syscall = includes_conf[arg_name]
+        if syscall_conf['arguments'].get(arg_name, None) == None:
+            newargs.append(arg)
+        else:
+            newargs.append(arg.replace(arg_name, syscall_conf['arguments'][arg_name]))
+    return syscall, newargs

@@ -1,5 +1,14 @@
 {
     "correct": {
+        "accept": {
+            "name": "accept",
+            "arguments": {
+                "fd": "sockfd"
+            },
+            "includes": {
+                "flags": "accept4"
+            }
+        },
         "bind": {
             "name": "bind",
             "arguments": {
