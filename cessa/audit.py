@@ -84,8 +84,9 @@ def adjust_seccomp(container):
         # test
         start_time = time.time()
         container.run(with_seccomp=True)
+        sleep(3) # wait for container starting
         container.exec_workload()
-        sleep(1) # wait for workload
+        sleep(1) # wait for workload ending
         container.remove()
 
         # audit
