@@ -453,6 +453,230 @@ arg_type(shutdown_sockfd, fd)
 arg_type(shutdown_how, range)
 all_value(shutdown_how, (SHUT_RD, SHUT_WR, SHUT_RDWR))
 
+## 49
+# int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+# bind a name to a socket
+clabel(bind, ())
+arg_list(bind, (bind_sockfd, bind_addr, bind_addrlen))
+arg_index(bind_sockfd, 0)
+arg_index(bind_addr, 1)
+arg_index(bind_addrlen, 2)
+arg_type(bind_sockfd, fd)
+arg_type(bind_addr, pointer)
+arg_type(bind_addrlen, bufsize)
+
+## 50
+# int listen(int sockfd, int backlog);
+# listen for connections on a socket
+clabel(listen, ())
+arg_list(listen, (listen_sockfd, listen_backlog))
+arg_index(listen_sockfd, 0)
+arg_index(listen_backlog, 1)
+arg_type(listen_sockfd, fd)
+arg_type(listen_backlog, other)
+
+## 51
+# int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+# get socket name
+clabel(getsockname, ())
+arg_list(getsockname, (getsockname_sockfd, getsockname_addr, getsockname_addrlen))
+arg_index(getsockname_sockfd, 0)
+arg_index(getsockname_addr, 1)
+arg_index(getsockname_addrlen, 2)
+arg_type(getsockname_sockfd, fd)
+arg_type(getsockname_addr, pointer)
+arg_type(getsockname_addrlen, pointer)
+
+## 52
+# int getpeername(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+# get name of connected peer socket
+clabel(getpeername, ())
+arg_list(getpeername, (getpeername_sockfd, getpeername_addr, getpeername_addrlen))
+arg_index(getpeername_sockfd, 0)
+arg_index(getpeername_addr, 1)
+arg_index(getpeername_addrlen, 2)
+arg_type(getpeername_sockfd, fd)
+arg_type(getpeername_addr, pointer)
+arg_type(getpeername_addrlen, pointer)
+
+## 53
+# int socketpair(int domain, int type, int protocol, int sv[2]);
+# create a pair of connected sockets
+clabel(socketpair, (IPv4, IPv6))
+arg_list(socketpair, (socketpair_domain, socketpair_type, socketpair_protocol, socketpair_sv))
+arg_index(socketpair_domain, 0)
+arg_index(socketpair_type, 1)
+arg_index(socketpair_protocol, 2)
+arg_index(socketpair_sv, 3)
+arg_type(socketpair_domain, range)
+arg_type(socketpair_type, bitwise)
+arg_type(socketpair_protocol, other)
+arg_type(socketpair_sv, pointer)
+arg_related(socketpair_domain, socketpair_type)
+all_value(socket_domain, (AF_LOCAL, AF_INET, AF_INET6, AF_IPX, AF_NETLINK, AF_X25, AF_AX25, AF_ATMPVC, AF_APPLETALK, AF_PACKET, AF_ALG))
+all_value(socket_type, (SOCK_STREAM, SOCK_DGRAM, SOCK_SEQPACKET, SOCK_RAW, SOCK_RDM, SOCK_PACKET, SOCK_NONBLOCK, SOCK_CLOEXEC))
+
+## 54
+# int setsockopt(int sockfd, int level, int optname,
+#                const void *optval, socklen_t *optlen);
+# set options on sockets
+clabel(setsockopt, ())
+arg_list(setsockopt, (setsockopt_sockfd, setsockopt_level, setsockopt_optname, setsockopt_optval, setsockopt_optlen))
+arg_index(setsockopt_sockfd, 0)
+arg_index(setsockopt_level, 1)
+arg_index(setsockopt_optname, 2)
+arg_index(setsockopt_optval, 3)
+arg_index(setsockopt_optlen, 4)
+arg_type(setsockopt_sockfd, fd)
+arg_type(setsockopt_level, other)
+arg_type(setsockopt_optname, other)
+arg_type(setsockopt_optval, pointer)
+arg_type(setsockopt_optlen, pointer)
+
+## 55
+# int getsockopt(int sockfd, int level, int optname,
+#                void *optval, socklen_t *optlen);
+# get options on sockets
+clabel(getsockopt, ())
+arg_list(getsockopt, (getsockopt_sockfd, getsockopt_level, getsockopt_optname, getsockopt_optval, getsockopt_optlen))
+arg_index(getsockopt_sockfd, 0)
+arg_index(getsockopt_level, 1)
+arg_index(getsockopt_optname, 2)
+arg_index(getsockopt_optval, 3)
+arg_index(getsockopt_optlen, 4)
+arg_type(getsockopt_sockfd, fd)
+arg_type(getsockopt_level, other)
+arg_type(getsockopt_optname, other)
+arg_type(getsockopt_optval, pointer)
+arg_type(getsockopt_optlen, pointer)
+
+## 56
+# int clone(int (*fn) (void *), void *child_stack,
+#           int flags, void *arg, ...);
+# create a child process
+clabel(clone, ())
+arg_list(clone, (clone_fn, clone_child_stack, clone_flags, clone_arg))
+arg_index(clone_fn, 0)
+arg_index(clone_child_stack, 1)
+arg_index(clone_flags, 2)
+arg_index(clone_arg, 3)
+arg_type(clone_fn, pointer)
+arg_type(clone_child_stack, pointer)
+arg_type(clone_flags, bitwise)
+arg_type(clone_arg, pointer)
+all_value(clone_flags, (CLONE_CHILD_CLEARTID, CLONE_CHILD_SETTID, CLONE_FILES, CLONE_FS, CLONE_IO, CLONE_NEWCGROUP, CLONE_NEWIPC, CLONE_NEWNET, CLONE_NEWNS, CLONE_NEWPID, CLONE_NEWUSER, CLONE_NEWUTS, CLONE_PARENT, CLONE_PARENT_SETTID, CLONE_PID, CLONE_PTRACE, CLONE_SETTLS, CLONE_SIGHAND, CLONE_STOPPED, CLONE_SYSVSEM, CLONE_THREAD, CLONE_UNTRACED, CLONE_VFORK, CLONE_VM))
+
+## 57
+# pid_t fork(void)
+# create a child process
+clabel(fork, ())
+arg_list(fork, ())
+
+## 58
+# pid_t vfork(void)
+# create a child process and block parent
+clabel(vfork, ())
+arg_list(vfork, ())
+
+## 59
+# int execve(const char *filename, char *const argv[], char *const envp[]);
+# execute program
+clabel(execve, ())
+arg_list(execve, (execve_filename, execve_argv, execve_envp))
+arg_index(execve_filename, 0)
+arg_index(execve_argv, 1)
+arg_index(execve_envp, 2)
+arg_type(execve_filename, pointer)
+arg_type(execve_argv, pointer)
+arg_type(execve_envp, pointer)
+
+## 60
+# void _exit(int status);
+# terminate the calling process
+clabel(exit, ())
+arg_list(exit, (exit_status))
+arg_index(exit_status, 0)
+arg_type(exit_status, other)
+
+## 61
+# pid_t wait4(pid_t pid, int *wstatus, int options,
+#             struct rusage *rusage);
+# wait for process to change state, BSD style
+clabel(wait4, ())
+arg_list(wait4, (wait4_pid, wait4_wstatus, wait4_options, wait4_rusage))
+arg_index(wait4_pid, 0)
+arg_index(wait4_wstatus, 1)
+arg_index(wait4_options, 2)
+arg_index(wait4_rusage, 3)
+arg_type(wait4_pid, other)
+arg_type(wait4_wstatus, pointer)
+arg_type(wait4_options, other)
+arg_type(wait4_rusage, pointer)
+
+## 62
+# int kill(pid_t pid, int sig);
+# send signal to a process
+clabel(kill, ())
+arg_list(kill, (kill_pid, kill_sig))
+arg_index(kill_pid, 0)
+arg_index(kill_sig, 1)
+arg_type(kill_pid, other)
+arg_type(kill_sig, other)
+
+## 63
+# int uname(struct utsname *buf);
+# get name and information about current kernel
+clabel(uname, ())
+arg_list(uname, (uname_buf))
+arg_index(uname_buf, 0)
+arg_type(uname_buf, pointer)
+
+## 64
+# in semget(key_t key, int nsems, int semflg);
+# get a System V semaphore set identifier
+clabel(semget, ())
+arg_list(semget, (semget_key, semget_nsems, semget_semflg))
+arg_index(semget_key, 0)
+arg_index(semget_nsems, 1)
+arg_index(semget_semflg, 2)
+arg_type(semget_key, other)
+arg_type(semget_nsems, other)
+arg_type(semget_semflg, other)
+
+## 65
+# int semop(int semid, struct sembuf *sops, size_t nsops);
+# System V semaphore operations
+clabel(semop, ())
+arg_list(semop, (semop_semid, semop_sops, semop_nsops))
+arg_index(semop_semid, 0)
+arg_index(semop_sops, 1)
+arg_index(semop_nsops, 2)
+arg_type(semop_semid, other)
+arg_type(semop_sops, pointer)
+arg_type(semop_nsops, other)
+
+## 66
+# int semctl(int semid, int semnum, int cmd, ...);
+# System V semaphore control operations
+clabel(semctl, ())
+arg_list(semctl, (semctl_semid, semctl_semnum, semctl_cmd))
+arg_index(semctl_semid, 0)
+arg_index(semctl_semnum, 1)
+arg_index(semctl_cmd, 2)
+arg_type(semctl_semid, other)
+arg_type(semctl_semnum, pointer)
+arg_type(semctl_cmd, range)
+all_value(semctl_cmd, (IPC_STAT, IPC_SET, IPC_RMID, IPC_INFO, SEM_INFO, SEM_STAT, GETALL, GETNCNT, GETPID, GETVAL, GETZCNT, SETALL, SETVAL))
+
+## 72
+# int fcntl(int fd, int cmd, ...);
+# manipulate file descriptor
+clabel(fcntl, ())
+arg_list(fcntl, (fcntl_fd, fcntl_cmd))
+arg_index(fcntl_fd, 0)
+arg_index(fcntl_cmd, 1)
+arg_type(fcntl_fd, fd)
+arg_type(fcntl_cmd, other)
 
 # int access(const char *pathname, int mode);
 
