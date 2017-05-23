@@ -83,11 +83,18 @@ def adjust_seccomp(container):
     while True:
         # test
         start_time = time.time()
-        container.run(with_seccomp=True)
-        sleep(3) # wait for container starting
-        container.exec_workload()
-        sleep(1) # wait for workload ending
-        container.remove()
+        try:
+            container.run(with_seccomp=True)
+            #sleep(3) # wait for container starting
+            container.exec_workload()
+            #sleep(1) # wait for workload ending
+            container.remove()
+        except RuntimeError:
+            pass
+        try:
+            container.remove()
+        except RuntimeError:
+            pass
 
         # audit
         events = _get_seccomp_events(start_time)

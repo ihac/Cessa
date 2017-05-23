@@ -123,7 +123,7 @@ class Container(object):
         :returns: Popen object
 
         """
-        cmd = ['docker', 'run']
+        cmd = ['docker', 'run', '-d']
         if with_seccomp and self.seccomp != None:
             cmd += ['--security-opt', 'seccomp={}'.format(self.seccomp)]
         cmd += ['--name', self.name]
@@ -135,10 +135,9 @@ class Container(object):
                              stderr = subprocess.PIPE,
                              universal_newlines = True)
         # sleep(0.1)
-        if None != p.poll() > 0:
+        if p.wait() > 0:
             _, err = p.communicate()
             raise RuntimeError('Unable to run container {} with command \'{}\''.format(self.name, cmd), err)
-        return p
 
     def exec_workload(self):
         """ execute the workload script of container
@@ -202,10 +201,10 @@ def trace_syscall(container, trace_file):
         sysdigp = start_sysdig(container.name, open(trace_file, 'w'))
         container.run()
         # wait for starting container
-        sleep(5)
+        # sleep(1)
         container.exec_workload()
         # wait for sysdig recording workload syscall
-        sleep(3)
+        # sleep(3)
         sysdigp.kill()
         container.remove()
     except Exception as e:
