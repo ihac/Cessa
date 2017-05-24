@@ -112,3 +112,12 @@ define(SOCK_NONBLOCK, 2048)
 define(SHUT_RD, 0)
 define(SHUT_WR, 1)
 define(SHUT_RDWR, 2)
+
+# flock
+define(LOCK_SH, 1)
+define(LOCK_EX, 2)
+define(LOCK_UN, 8)
+define(LOCK_NB, 4)
+define(LOCK_SH_NB, 5)
+define(LOCK_EX_NB, 6)
+define(LOCK_UN_NB, 12)

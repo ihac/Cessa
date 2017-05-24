@@ -678,5 +678,16 @@ arg_index(fcntl_cmd, 1)
 arg_type(fcntl_fd, fd)
 arg_type(fcntl_cmd, other)
 
+## 73
+# int flock(int fd, int operation);
+# apply or remove an advisory lock on an open file
+clabel(flock, ())
+arg_list(flock, (flock_fd, flock_operation))
+arg_index(flock_fd, 0)
+arg_index(flock_operation, 1)
+arg_type(flock_fd, fd)
+arg_type(flock_operation, range)
+all_value(flock_operation, (LOCK_SH, LOCK_EX, LOCK_UN, LOCK_SH_NB, LOCK_EX_NB, LOCK_UN_NB))
+
 # int access(const char *pathname, int mode);
 

@@ -13,20 +13,20 @@ except NameError:
 
 def get_target_pkg():
     return target_pkg.target_pkg(__name__, __file__, pyke_version, loader, {
-         ('', '', 'questions.kqb'):
-           [1495374151.84925, 'questions.qbc'],
-         ('', '', 'argument.kfb'):
-           [1495374151.866534, 'argument.fbc'],
          ('', '', 'bc_relate.krb'):
-           [1495374151.907056, 'bc_relate_bc.py'],
-         ('', '', 'question_fact.kfb'):
-           [1495374151.911798, 'question_fact.fbc'],
-         ('', '', 'question_rule.krb'):
-           [1495374151.915854, 'question_rule_bc.py'],
+           [1495630581.250526, 'bc_relate_bc.py'],
          ('', '', 'macro.kfb'):
-           [1495374151.923852, 'macro.fbc'],
+           [1495630581.269349, 'macro.fbc'],
+         ('', '', 'argument.kfb'):
+           [1495630581.270966, 'argument.fbc'],
+         ('', '', 'questions.kqb'):
+           [1495630581.277307, 'questions.qbc'],
          ('', '', 'syscall.kfb'):
-           [1495374151.97082, 'syscall.fbc'],
+           [1495630581.328257, 'syscall.fbc'],
+         ('', '', 'question_fact.kfb'):
+           [1495630581.329364, 'question_fact.fbc'],
+         ('', '', 'question_rule.krb'):
+           [1495630581.333748, 'question_rule_bc.py'],
         },
         compiler_version)
 
