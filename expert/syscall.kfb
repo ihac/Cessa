@@ -689,5 +689,44 @@ arg_type(flock_fd, fd)
 arg_type(flock_operation, range)
 all_value(flock_operation, (LOCK_SH, LOCK_EX, LOCK_UN, LOCK_SH_NB, LOCK_EX_NB, LOCK_UN_NB))
 
+## 78
+# int getdents(unsigned int fd, struct linux_dirent *dirp,
+#              unsigned int count);
+# get directory entries
+clabel(getdents, ())
+arg_list(getdents, (getdents_fd, getdents_dirp, getdents_count))
+arg_index(getdents_fd, 0)
+arg_index(getdents_dirp, 1)
+arg_index(getdents_count, 2)
+arg_type(getdents_fd, fd)
+arg_type(getdents_dirp, pointer)
+arg_type(getdents_count, bufsize)
+
+## 79
+# char *getcwd(char *buf, size_t size);
+# get current working directory
+clabel(getcwd, ())
+arg_list(getcwd, (getcwd_buf, getcwd_size))
+arg_index(getcwd_buf, 0)
+arg_index(getcwd_size, 1)
+arg_type(getcwd_buf, pointer)
+arg_type(getcwd_size, bufsize)
+
+## 80
+# int chdir(const char *path);
+# change working directory
+clabel(chdir, ())
+arg_list(chdir, (chdir_path))
+arg_index(chdir_path, 0)
+arg_type(chdir_path, pointer)
+
+## 81
+# int fchdir(int fd);
+# change working directory
+clabel(fchdir, ())
+arg_list(fchdir, (fchdir_path))
+arg_index(fchdir_path, 0)
+arg_type(fchdir_path, pointer)
+
 # int access(const char *pathname, int mode);
 
