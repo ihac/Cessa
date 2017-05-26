@@ -728,5 +728,26 @@ arg_list(fchdir, (fchdir_path))
 arg_index(fchdir_path, 0)
 arg_type(fchdir_path, pointer)
 
+## 82
+# int rename(const char *oldpath, const char *newpath);
+# change the name or location of a file
+clabel(rename, ())
+arg_list(rename, (rename_oldpath, rename_newpath))
+arg_index(rename_oldpath, 0)
+arg_index(rename_newpath, 1)
+arg_type(rename_oldpath, pointer)
+arg_type(rename_newpath, pointer)
+
+## 83
+# int mkdir(const char *pathname, mode_t mode);
+# create a directory
+clabel(mkdir, ())
+arg_list(mkdir, (mkdir_pathname, mkdir_mode))
+arg_index(mkdir_pathname, 0)
+arg_index(mkdir_mode, 1)
+arg_type(mkdir_pathname, pointer)
+arg_type(mkdir_mode, other)
+# TODO change type of mkdir_mode to range
+
 # int access(const char *pathname, int mode);
 
