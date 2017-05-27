@@ -108,7 +108,7 @@ def adjust_seccomp(container):
                 error_syscall_set.add(int(p.group(1)))
         for sys_id in error_syscall_set:
             sys_name = syscall_name(systable, sys_id)
-            print('adjust \'{}\' to lower limit level'.format(sys_name))
+            print('* DEGRADE {0: <16} to NAME level'.format(sys_name))
             container.del_rules(sys_name)
             container.add_rules(gen_rules([sys_name], level=Level.NAME)[0])
         # replace original seccomp profiles with new rules

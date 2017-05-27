@@ -546,7 +546,7 @@ def _powers_of_2(num):
     return powers
 
 def _arg_is_valid(arg_dict_item):
-    valid_args = ['fd', 'bitwise', 'bufsize', 'range']
+    valid_args = ['bitwise', 'bufsize', 'range']
     arg_name, _ = arg_dict_item
     arg_type = knowledge.get_arg_type(arg_name)
     return arg_type in valid_args
