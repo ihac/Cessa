@@ -749,5 +749,23 @@ arg_type(mkdir_pathname, pointer)
 arg_type(mkdir_mode, other)
 # TODO change type of mkdir_mode to range
 
+## 84
+# int rmdir(const char *pathname);
+# delete a directory
+clabel(rmdir, ())
+arg_list(rmdir, (rmdir_pathname))
+arg_index(rmdir_pathname, 0)
+arg_type(rmdir_pathname, pointer)
+
+## 85
+# int creat(const char *pathname, mode_t mode);
+# open and possibly create a file
+clabel(creat, ())
+arg_list(creat, (creat_pathname, creat_mode))
+arg_index(creat_pathname, 0)
+arg_index(creat_mode, 1)
+arg_type(creat_pathname, pointer)
+arg_type(creat_mode, bitwise)
+
 # int access(const char *pathname, int mode);
 

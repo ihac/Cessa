@@ -13,20 +13,20 @@ except NameError:
 
 def get_target_pkg():
     return target_pkg.target_pkg(__name__, __file__, pyke_version, loader, {
-         ('', '', 'bc_relate.krb'):
-           [1495806479.467554, 'bc_relate_bc.py'],
-         ('', '', 'macro.kfb'):
-           [1495806479.482404, 'macro.fbc'],
-         ('', '', 'question_rule.krb'):
-           [1495806479.485409, 'question_rule_bc.py'],
-         ('', '', 'argument.kfb'):
-           [1495806479.487064, 'argument.fbc'],
          ('', '', 'questions.kqb'):
-           [1495806479.495429, 'questions.qbc'],
-         ('', '', 'syscall.kfb'):
-           [1495806479.559821, 'syscall.fbc'],
+           [1496070490.552219, 'questions.qbc'],
          ('', '', 'question_fact.kfb'):
-           [1495806479.561614, 'question_fact.fbc'],
+           [1496070490.565078, 'question_fact.fbc'],
+         ('', '', 'syscall.kfb'):
+           [1496070490.610265, 'syscall.fbc'],
+         ('', '', 'argument.kfb'):
+           [1496070490.612955, 'argument.fbc'],
+         ('', '', 'bc_relate.krb'):
+           [1496070490.643758, 'bc_relate_bc.py'],
+         ('', '', 'question_rule.krb'):
+           [1496070490.64867, 'question_rule_bc.py'],
+         ('', '', 'macro.kfb'):
+           [1496070490.659138, 'macro.fbc'],
         },
         compiler_version)
 

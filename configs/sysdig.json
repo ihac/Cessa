@@ -82,6 +82,12 @@
                 "fd": "sockfd"
             }
         },
+        "rmdir": {
+            "name": "rmdir",
+            "arguments": {
+                "path": "pathname"
+            }
+        },
         "mkdir": {
             "name": "mkdir",
             "arguments": {
