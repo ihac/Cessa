@@ -1,0 +1,3 @@
+--allow-external pyke
+--allow-unverified pyke
+pyke
