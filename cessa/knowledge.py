@@ -4,7 +4,7 @@
 from pyke import knowledge_engine
 from cessa.config import PROJECT_NAME
 from pyke.knowledge_engine import CanNotProve
-es_engine = knowledge_engine.engine((None, 'expert.compiled_krb'))
+es_engine = knowledge_engine.engine((None, 'cessa.expert.compiled_krb'))
 # es_engine = knowledge_engine.engine((None, 'cessa/compiled_knowledge'))
 
 es_engine.activate('bc_relate')
