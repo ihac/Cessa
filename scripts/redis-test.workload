@@ -1,0 +1,16 @@
+#!/bin/bash
+
+sleep 0.5
+docker run --link redis-test:redis --rm redis redis-benchmark -h 10.10.105.208 -t set,get -n 100000 -c 100 -P 1 --csv  >/dev/null 2>&1
+docker run --link redis-test:redis --rm redis redis-benchmark -h 10.10.105.208 -t set,get -n 100000 -c 100 -P 10 --csv  >/dev/null 2>&1
+docker run --link redis-test:redis --rm redis redis-benchmark -h 10.10.105.208 -t set,get -n 100000 -c 100 -P 20 --csv  >/dev/null 2>&1
+docker run --link redis-test:redis --rm redis redis-benchmark -h 10.10.105.208 -t set,get -n 100000 -c 100 -P 30 --csv  >/dev/null 2>&1
+docker run --link redis-test:redis --rm redis redis-benchmark -h 10.10.105.208 -t set,get -n 100000 -c 100 -P 40 --csv  >/dev/null 2>&1
+docker run --link redis-test:redis --rm redis redis-benchmark -h 10.10.105.208 -t set,get -n 100000 -c 100 -P 50 --csv  >/dev/null 2>&1
+docker run --link redis-test:redis --rm redis redis-benchmark -h 10.10.105.208 -t set,get -n 100000 -c 100 -P 60 --csv  >/dev/null 2>&1
+docker run --link redis-test:redis --rm redis redis-benchmark -h 10.10.105.208 -t set,get -n 100000 -c 100 -P 70 --csv  >/dev/null 2>&1
+docker run --link redis-test:redis --rm redis redis-benchmark -h 10.10.105.208 -t set,get -n 100000 -c 100 -P 80 --csv  >/dev/null 2>&1
+docker run --link redis-test:redis --rm redis redis-benchmark -h 10.10.105.208 -t set,get -n 100000 -c 100 -P 90 --csv  >/dev/null 2>&1
+docker run --link redis-test:redis --rm redis redis-benchmark -h 10.10.105.208 -t set,get -n 100000 -c 100 -P 100 --csv  >/dev/null 2>&1
+sleep 0.5
+docker run --link redis-test:redis --rm redis redis-cli -h 10.10.105.208 flushall >/dev/null 2>&1

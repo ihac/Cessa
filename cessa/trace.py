@@ -188,6 +188,10 @@ def start_sysdig(container_name, out_fp):
         raise RuntimeError('Unable to start sysdig with command \'{}\''.format(cmd), err)
     return p
 
+def track_container(container, trace_file, record_dir):
+    trace_syscall(container, trace_file)
+    return data_preprocessing(trace_file, record_dir)
+
 def trace_syscall(container, trace_file):
     """ uses sysdig to trace container's syscall with executing workload script.
 
@@ -232,6 +236,8 @@ def data_preprocessing(trace_file, out_dir):
             mark, name, *args = line.split()[5:]
             # '>' means syscall entry, '<' means syscall return
             if mark == '>':
+                if name in sysdig_conf['abandon']:
+                    continue
                 name, args = correct_syscall(name, args, sysdig_conf)
                 syscall_list.add(name)
                 if syscall_info.get(name, None) == None:

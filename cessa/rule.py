@@ -319,7 +319,8 @@ def gen_arg_rule_1(syscall,
 def gen_arg_rule_1_whitelist(syscall, match_action, record_dir):
     syscall_dir = os.path.join(record_dir, syscall)
     if not os.path.isdir(syscall_dir):
-        raise RuntimeError('\'{}\' is not a directory'.format(syscall_dir))
+        return gen_name_rules([syscall], match_action)[0].rules
+        # raise RuntimeError('\'{}\' is not a directory'.format(syscall_dir))
     arg_value_dict = retrieve_arg_value(syscall, os.path.join(syscall_dir, 'args.uniq.list'))
     arg_value_dict = dict(filter(_arg_is_valid, arg_value_dict.items()))
     if (len(arg_value_dict) == 0):

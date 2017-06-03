@@ -1,4 +1,7 @@
 {
+    "abandon": [
+        "<unknown>"
+    ],
     "correct": {
         "read": {
             "name": "read",

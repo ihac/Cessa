@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sleep 45
+docker run --link mysql-test:mysql --rm mysql sh -c 'exec mysqlslap -h"$MYSQL_PORT_3306_TCP_ADDR" -P"$MYSQL_PORT_3306_TCP_PORT" -a -c 1 -i 1 -uroot -ppassword' >/dev/null 2>&1
