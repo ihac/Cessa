@@ -121,3 +121,43 @@ define(LOCK_NB, 4)
 define(LOCK_SH_NB, 5)
 define(LOCK_EX_NB, 6)
 define(LOCK_UN_NB, 12)
+
+# chmod
+define(S_ISUID, 2048)
+define(S_ISGID, 1024)
+define(S_ISVTX, 512)
+define(S_IRUSR, 256)
+define(S_IWUSR, 128)
+define(S_IXUSR, 64)
+define(S_IRGRP, 32)
+define(S_IWGRP, 16)
+define(S_IXGRP, 8)
+define(S_IROTH, 4)
+define(S_IWOTH, 2)
+define(S_IXOTH, 1)
+
+# getrlimit
+define(RLIMIT_CPU, 0)
+define(RLIMIT_FSIZE, 1)
+define(RLIMIT_DATA, 2)
+define(RLIMIT_STACK, 3)
+define(RLIMIT_CORE, 4)
+define(RLIMIT_RSS, 5)
+define(RLIMIT_NPROC, 6)
+define(RLIMIT_NOFILE, 7)
+define(RLIMIT_MEMLOCK, 8)
+define(RLIMIT_AS, 9)
+define(RLIMIT_LOCKS, 10)
+define(RLIMIT_SIGPENDING, 11)
+define(RLIMIT_MSGQUEUE, 12)
+define(RLIMIT_NICE, 13)
+define(RLIMIT_RTPRIO, 14)
+define(RLIMIT_RTTIME, 15)
+
+# getrusage
+define(RUSAGE_SELF, 0)
+define(RUSAGE_CHILDREN, -1)
+define(RUSAGE_BOTH, -2)
+define(RUSAGE_THREAD, 1)
+
+

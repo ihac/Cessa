@@ -767,5 +767,196 @@ arg_index(creat_mode, 1)
 arg_type(creat_pathname, pointer)
 arg_type(creat_mode, bitwise)
 
-# int access(const char *pathname, int mode);
+# 86
+# int link(const char *oldpath, const char *newpath);
+# make a new name for a file
+clabel(link, ())
+arg_list(link, (link_oldpath, link_newpath))
+arg_index(link_oldpath, 0)
+arg_index(link_newpath, 1)
+arg_type(link_oldpath, pointer)
+arg_type(link_newpath, pointer)
 
+# 87
+# int unlink(const char *pathname);
+# delete a name and possibly the file it refers to
+clabel(unlink, ())
+arg_list(unlink, (unlink_pathname))
+arg_index(unlink_pathname, 0)
+arg_type(unlink_pathname, pointer)
+
+# 88
+# int symlink(const char *target, const char *linkpath);
+# make a new name for a file
+clabel(symlink, ())
+arg_list(symlink, (symlink_target, symlink_linkpath))
+arg_index(symlink_target, 0)
+arg_index(symlink_linkpath, 1)
+arg_type(symlink_target, pointer)
+arg_type(symlink_linkpath, pointer)
+
+# 89
+# ssize_t readlink(const char *pathname, char *buf, size_t bufsiz);
+# read value of a symbolic link
+clabel(readlink, ())
+arg_list(readlink, (readlink_pathname, readlink_buf, readlink_bufsiz))
+arg_index(readlink_pathname, 0)
+arg_index(readlink_buf, 1)
+arg_index(readlink_bufsiz, 2)
+arg_type(readlink_pathname, pointer)
+arg_type(readlink_buf, pointer)
+arg_type(readlink_bufsiz, bufsize)
+
+# 90
+# int chmod(const char *pathname, mode_t mode);
+# change permissions of a file
+clabel(chmod, ())
+arg_list(chmod, (chmod_pathname, chmod_mode))
+arg_index(chmod_pathname, 0)
+arg_index(chmod_mode, 1)
+arg_type(chmod_pathname, pointer)
+arg_type(chmod_mode, bitwise)
+all_value(chmod_mode, (S_ISUID, S_ISGID, S_ISVTX, S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH))
+
+# 91
+# int fchmod(int fd, mode_t mode);
+# change permissions of a file
+clabel(fchmod, ())
+arg_list(fchmod, (fchmod_fd, fchmod_mode))
+arg_index(fchmod_fd, 0)
+arg_index(fchmod_mode, 1)
+arg_type(fchmod_fd, fd)
+arg_type(fchmod_mode, bitwise)
+all_value(fchmod_mode, (S_ISUID, S_ISGID, S_ISVTX, S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH))
+
+# 92
+# int chown(const char *pathname, uid_t owner, gid_t group);
+# change ownership of a file
+clabel(chown, ())
+arg_list(chown, (chown_pathname, chown_owner, chown_group))
+arg_index(chown_pathname, 0)
+arg_index(chown_owner, 1)
+arg_index(chown_group, 2)
+arg_type(chown_pathname, pointer)
+arg_type(chown_owner, other)
+arg_type(chown_group, other)
+
+# 93
+# int fchown(int fd, uid_t owner, gid_t group);
+# change ownership of a file
+clabel(fchown, ())
+arg_list(fchown, (fchown_fd, fchown_owner, fchown_group))
+arg_index(fchown_fd, 0)
+arg_index(fchown_owner, 1)
+arg_index(fchown_group, 2)
+arg_type(fchown_fd, fd)
+arg_type(fchown_owner, other)
+arg_type(fchown_group, other)
+
+# 94
+# int lchown(const char *pathname, uid_t owner, gid_t group);
+# change ownership of a file
+# lchown() is like chown(), but does not dereference symbolic links.
+clabel(lchown, ())
+arg_list(lchown, (lchown_pathname, lchown_owner, lchown_group))
+arg_index(lchown_pathname, 0)
+arg_index(lchown_owner, 1)
+arg_index(lchown_group, 2)
+arg_type(lchown_pathname, pointer)
+arg_type(lchown_owner, other)
+arg_type(lchown_group, other)
+
+# 95
+# mode_t umask(mode_t mask);
+# set file mode creation mask
+# umask() sets the calling process's file mode creation mask (umask) to
+#   mask & 0777 (i.e., only the file permission bits of mask are used),
+#   and returns the previous value of the mask.
+clabel(umask, ())
+arg_list(umask, (umask_mask))
+arg_index(umask_mask, 0)
+arg_type(umask_mask, bitwise)
+all_value(umask_mask, (S_ISUID, S_ISGID, S_ISVTX, S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH))
+
+# 96
+# int gettimeofday(struct timeval *tv, struct timezone *tz);
+# get time
+# The functions gettimeofday() and settimeofday() can get and set the
+#   time as well as a timezone.  The tv argument is a struct timeval
+clabel(gettimeofday, ())
+arg_list(gettimeofday, (gettimeofday_tv, gettimeofday_tz))
+arg_index(gettimeofday_tv, 0)
+arg_index(gettimeofday_tz, 1)
+arg_type(gettimeofday_tv, pointer)
+arg_type(gettimeofday_tz, pointer)
+
+# 97
+# int getrlimit(int resource, struct rlimit *rlim);
+# get resource limits
+# The getrlimit() and setrlimit() system calls get and set resource
+#   limits respectively.  Each resource has an associated soft and hard
+#   limit, as defined by the rlimit structure
+clabel(getrlimit, ())
+arg_list(getrlimit, (getrlimit_resource, getrlimit_rlim))
+arg_index(getrlimit_resource, 0)
+arg_index(getrlimit_rlim, 1)
+arg_type(getrlimit_resource, range)
+arg_type(getrlimit_rlim, pointer)
+all_value(getrlimit_resource, (RLIMIT_AS, RLIMIT_CORE, RLIMIT_CPU, RLIMIT_DATA, RLIMIT_FSIZE, RLIMIT_LOCKS, RLIMIT_MEMLOCK, RLIMIT_MSGQUEUE, RLIMIT_NICE, RLIMIT_NOFILE, RLIMIT_NPROC, RLIMIT_RSS, RLIMIT_RTPRIO, RLIMIT_RTTIME, RLIMIT_SIGPENDING, RLIMIT_STACK))
+
+# 98
+# int getrusage(int who, struct rusage *usage);
+# get resource usage
+clabel(getrusage, ())
+arg_list(getrusage, (getrusage_who, getrusage_usage))
+arg_index(getrusage_who, 0)
+arg_index(getrusage_usage, 1)
+arg_type(getrusage_who, range)
+arg_type(getrusage_usage, pointer)
+all_value(getrusage_who, (RUSAGE_SELF, RUSAGE_CHILDREN, RUSAGE_THREAD))
+
+# 100
+# clock_t times(struct tms *buf);
+# get process time
+# times() stores the current process times in the struct tms that buf
+#   points to.
+clabel(times, ())
+arg_list(times, (times_buf))
+arg_index(times_buf, 0)
+arg_type(times_buf, pointer)
+
+# 101
+# long ptrace(enum __ptrace_request request, pid_t pid,
+#             void *addr, void *data);
+# process trace
+# The ptrace() system call provides a means by which one process (the
+#   "tracer") may observe and control the execution of another process
+#   (the "tracee"), and examine and change the tracee's memory and
+#   registers.
+clabel(ptrace, ())
+arg_list(ptrace, (ptrace_request, ptrace_pid, ptrace_addr, ptrace_data))
+arg_index(ptrace_request, 0)
+arg_index(ptrace_pid, 1)
+arg_index(ptrace_addr, 2)
+arg_index(ptrace_data, 3)
+# TODO
+arg_type(ptrace_request, range)
+arg_type(ptrace_pid, other)
+arg_type(ptrace_addr, pointer)
+arg_type(ptrace_data, pointer)
+
+# 102
+# uid_t getuid(void);
+# get user identity
+# getuid() returns the real user ID of the calling process.
+clabel(getuid, ())
+arg_list(getuid, ())
+
+
+# int settimeofday(const struct timeval *tv, const struct timezone *tz);
+clabel(settimeofday, ())
+arg_list(settimeofday, (settimeofday_tv, settimeofday_tz))
+arg_index(settimeofday_tv, 0)
+arg_index(settimeofday_tz, 1)
+arg_type(settimeofday_tv, pointer)
+arg_type(settimeofday_tz, pointer)
