@@ -21,6 +21,12 @@
                 "interval": "req"
             }
         },
+        "unlink": {
+            "name": "unlink",
+            "arguments": {
+                "path": "pathname"
+            }
+        },
         "sendfile": {
             "name": "sendfile",
             "arguments": {

@@ -13,8 +13,8 @@ This module defines all configuration constants for seccomp profile.
 from enum import Enum, unique
 
 PROJECT_NAME = 'Cessa'
-SYSTABLE_FILE = 'configs/systable.list'
-SYSDIG_CONF_FILE = 'configs/sysdig.json'
+SYSTABLE_FILE = '/usr/local/configs/systable.list'
+SYSDIG_CONF_FILE = '/usr/local/configs/sysdig.json'
 LOG_FILE = '/var/log/audit/audit.log'
 
 @unique
