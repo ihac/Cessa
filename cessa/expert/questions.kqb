@@ -5,6 +5,13 @@ hint($project, $container, $ans)
     ---
     $ans = yn
 
+process_kind($container_name, $ans)
+    The container $container_name is Single-Process or Multi-Process?
+    ---
+    $ans = select_1
+        SNG_P: Single process
+        MUL_P: Multiple Process
+
 main_kind($container_name, $ans)
     Which of these app kinds are suitable for container $container_name?
         - You might select all that apply.
@@ -26,3 +33,26 @@ web_label($container_name, $ans)
         IPv4: IPv4 (using IPv4 sockets)
         IPv6: IPv6 (using IPv6 sockets)
         LOCAL: Local (using UNIX domain sockets)
+        IPX: IPX(using Novell protocols)
+        NETLINK: Netlink(using Kernel user interface device)
+        X25: X25(using ITU-T X.25 / ISO-8208 protocol)
+        AX25: AX25(using Amateur radio AX.25 protocol)
+        ATMPVC: ATMPVC(Access to raw ATM PVCs)
+        APPLETALK: AppleTalk
+        PACKET: Packet(using low level packet interface)
+        ALG: ALG(Interface to kernel crypto API)
+
+web1_label($container_name, $ans)
+    Which of these WEB labels are suitable for container $container_name?
+        - You might select all that apply.
+    ---
+    $ans = select_n
+        TCP: TCP/Stream. Provides sequenced, reliable, two-way, connection-based byte streams.  An out-of-band data transmission mechanism may be supported.
+        UDP: UDP/Dgram. Supports datagrams (connectionless, unreliable messages of a fixed maximum length).
+        SEQPACKET: Provides a sequenced, reliable, two-way connection-based data transmission path for datagrams of fixed maximum length; a consumer is required to read an entire packet with each input system call.
+        RAW: Provides raw network protocol access.
+        RDM: Provides a reliable datagram layer that does not guarantee ordering.
+        NONBLOCK: Set the O_NONBLOCK file status flag on the new open file description.  Using this flag saves extra calls to fcntl() to achieve the same result.
+        CLOEXEC: Set the close-on-exec (FD_CLOEXEC) flag on the new file descriptor.  See the description of the O_CLOEXEC flag in open() for reasons why this may be useful.
+
+

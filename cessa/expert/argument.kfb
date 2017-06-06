@@ -1,15 +1,26 @@
 ## Application type
 # Web, Database
-relevant(Web, (AF_INET, AF_INET6))
+relevant(WEB, (AF_INET, AF_INET6))
 
 ## Detail
-# IPv4, IPv6
+# socket_domain
 relevant(IPv4, (AF_INET))
 relevant(IPv6, (AF_INET6))
-relevant(Local, (AF_LOCAL))
-relevant(Novell, (AF_IPX))
-conflicting(IPv4, (AF_INET6))
-conflicting(IPv6, (AF_INET))
+relevant(LOCAL, (AF_LOCAL))
+relevant(IPX, (AF_IPX))
+relavant(NETLINK, (AF_NETLINK))
+relavant(X25, (AF_X25))
+relavant(AX25, (AF_AX25))
+relavant(ATMPVC, (AF_ATMPVC))
+relavant(APPLETALK, (AF_APPLETALK))
+relavant(PACKET, (AF_PACKET))
+relavant(ALG, (AF_ALG))
 
+# socket_type
 relevant(TCP, (SOCK_STREAM))
 relevant(UDP, (SOCK_DGRAM))
+relevant(SEQPACKET, (SOCK_SEQPACKET))
+relevant(RAW, (SOCK_RAW))
+relevant(RDM, (SOCK_RDM))
+relevant(NONBLOCK, (SOCK_NONBLOCK))
+relevant(CLOEXEC, (SOCK_CLOEXEC))

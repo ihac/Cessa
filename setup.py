@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Cessa',
-    version='1.2.2rc1',
+    version='1.2.4rc1',
     description='A Docker security reinforcement system based on system call interception',
     # long_description=long_description,
     url='https://github.com/ihac/cessa',
@@ -22,6 +22,6 @@ setup(
     package_data={
         '': ['*.fbc', '*.qbc'],
     },
-    data_files=[('configs', ['configs/clabel.json', 'configs/systable.list', 'configs/sysdig.json'])],
+    data_files=[('configs', ['configs/clabel.list', 'configs/systable.list', 'configs/sysdig.json'])],
     scripts=['client/cessa'],
 )

@@ -151,8 +151,9 @@ if __name__ == '__main__':
 
     # dump rules
     print('>>> Dump Rules START')
-    container.set_seccomp(profile)
     cessa.dump_rules(profile, rule_coll_list)
+    container.set_rules(rule_coll_list)
+    container.set_seccomp(profile)
     print(' * Redirect to {}'.format(profile))
     print('>>> Dump Rules DONE')
 
