@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Cessa',
-    version='1.2.1rc1',
+    version='1.2.2rc1',
     description='A Docker security reinforcement system based on system call interception',
     # long_description=long_description,
     url='https://github.com/ihac/cessa',

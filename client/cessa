@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 import cessa
+import pkg_resources
 import os
 import sys, getopt
 
@@ -67,7 +68,8 @@ def get_input():
     workload = None
     for op, value in opts:
         if op == '-v' or op == '--version':
-            print('Cessa version 1.2.1rc1')
+            version = pkg_resources.require("cessa")[0].version
+            print('Cessa version {}'.format(version))
             os._exit(0)
         elif op == '-o':
             profile = value
