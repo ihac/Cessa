@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 import cessa
+import os
 import sys, getopt
 
 #workload = 'scripts/nginx-test.workload'
@@ -48,7 +49,8 @@ import sys, getopt
 
 
 def get_input():
-    opts, args = getopt.getopt(sys.argv[1:], "o:", ['opts=',
+    opts, args = getopt.getopt(sys.argv[1:], "vo:", ['version',
+                                                    'opts=',
                                                     'name=',
                                                     'image=',
                                                     'level=',
@@ -64,7 +66,10 @@ def get_input():
     profile = None
     workload = None
     for op, value in opts:
-        if op == '-o':
+        if op == '-v' or op == '--version':
+            print('Cessa version 1.2.1rc1')
+            os._exit(0)
+        elif op == '-o':
             profile = value
         elif op == '--name':
             container_name = value
