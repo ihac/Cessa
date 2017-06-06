@@ -97,6 +97,24 @@ def get_input():
 
     if container_name == None or image_id == None:
         raise ValueError('You have to provide both container name and image ID')
+    if profile == None:
+        profile = os.getcwd() + '/{}.profile'.format(container_name)
+    elif not os.path.isabs(profile):
+        profile = os.getcwd() + '/' + profile
+
+    if workload == None:
+        workload = os.getcwd() + '/{}.workload'.format(container_name)
+    elif not os.path.isabs(workload):
+        workload = os.getcwd() + '/' + workload
+
+    if record_dir == None:
+        record_dir = os.getcwd()
+    elif not os.path.isabs(record_dir):
+        record_dir = os.getcwd() + '/' + record_dir
+
+    if clabel_file != None and not os.path.isabs(clabel_file):
+        clabel_file = os.getcwd() + '/' + clabel_file
+
     return container_name, image_id, workload, level, c_opts, record_dir, clabel_file, profile
 
 if __name__ == '__main__':
@@ -121,7 +139,7 @@ if __name__ == '__main__':
     # generate rules
     print('>>> Generate Rules({}) START'.format(level))
     rule_coll_list = cessa.gen_rules(syscall_list,
-                                     match_action=level.Action.ALLOW,
+                                     match_action=cessa.Action.ALLOW,
                                      record_dir=record_dir,
                                      clabel_file=clabel_file,
                                      level=level)
